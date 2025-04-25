@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 interface AuthLayoutProps {
-  children: React.ReactNode;
-  title: string;
-  subtitle?: string;
+  children: React.ReactNode
+  title: string
+  subtitle?: string
 }
 
 const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) => {
@@ -15,19 +15,30 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
           {/* Logo */}
           <div className="mb-10">
             <div className="flex justify-center">
-              <svg className="h-12 w-12 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              <svg
+                className="h-12 w-12 text-blue-600"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
               </svg>
             </div>
           </div>
 
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">{title}</h1>
+            <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+              {title}
+            </h1>
             {subtitle && (
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {subtitle}
-              </p>
+              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">{subtitle}</p>
             )}
           </div>
 
@@ -35,23 +46,49 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
           {children}
         </div>
       </div>
-      
+
       {/* Right side - Decorative background (only visible on lg screens and up) */}
       <div className="hidden lg:block lg:w-1/2 relative bg-blue-600">
         <div className="absolute inset-0 bg-gradient-to-b from-blue-600 to-indigo-700">
           {/* Decorative shapes */}
           <div className="absolute inset-0 opacity-20">
-            <svg className="absolute left-full transform -translate-y-3/4 -translate-x-1/4" width="404" height="784" fill="none" viewBox="0 0 404 784">
+            <svg
+              className="absolute left-full transform -translate-y-3/4 -translate-x-1/4"
+              width="404"
+              height="784"
+              fill="none"
+              viewBox="0 0 404 784"
+            >
               <defs>
-                <pattern id="pattern-squares" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <pattern
+                  id="pattern-squares"
+                  x="0"
+                  y="0"
+                  width="20"
+                  height="20"
+                  patternUnits="userSpaceOnUse"
+                >
                   <rect x="0" y="0" width="4" height="4" fill="currentColor" />
                 </pattern>
               </defs>
               <rect width="404" height="784" fill="url(#pattern-squares)" />
             </svg>
-            <svg className="absolute right-full bottom-0 transform translate-x-1/4" width="404" height="784" fill="none" viewBox="0 0 404 784">
+            <svg
+              className="absolute right-full bottom-0 transform translate-x-1/4"
+              width="404"
+              height="784"
+              fill="none"
+              viewBox="0 0 404 784"
+            >
               <defs>
-                <pattern id="pattern-squares-2" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <pattern
+                  id="pattern-squares-2"
+                  x="0"
+                  y="0"
+                  width="20"
+                  height="20"
+                  patternUnits="userSpaceOnUse"
+                >
                   <rect x="0" y="0" width="4" height="4" fill="currentColor" />
                 </pattern>
               </defs>
@@ -59,7 +96,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
             </svg>
           </div>
         </div>
-        
+
         {/* Content overlay */}
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-center text-white">
@@ -71,7 +108,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitle }) =>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default AuthLayout;
+export default AuthLayout

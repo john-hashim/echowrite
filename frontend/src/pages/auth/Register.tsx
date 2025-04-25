@@ -1,27 +1,32 @@
-import React, { useState } from "react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
 
 const Register: React.FC = () => {
-
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [agreeTerms, setAgreeTerms] = useState(false)
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log({ name, email, password, confirmPassword, agreeTerms })
-   
   }
 
   const handleGoogleSignIn = () => {
-    console.log("Google sign-in clicked")
+    console.log('Google sign-in clicked')
   }
 
   return (
@@ -35,7 +40,13 @@ const Register: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+              <Input
+                id="name"
+                placeholder="John Doe"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -44,7 +55,7 @@ const Register: React.FC = () => {
                 type="email"
                 placeholder="m@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={e => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -54,8 +65,7 @@ const Register: React.FC = () => {
                 id="password"
                 type="password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
+                onChange={e => setPassword(e.target.value)}
               />
             </div>
             <div className="space-y-2">
@@ -64,7 +74,7 @@ const Register: React.FC = () => {
                 id="confirm-password"
                 type="password"
                 value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                onChange={e => setConfirmPassword(e.target.value)}
                 required
               />
             </div>
@@ -72,18 +82,18 @@ const Register: React.FC = () => {
               <Checkbox
                 id="terms"
                 checked={agreeTerms}
-                onCheckedChange={(checked) => setAgreeTerms(checked as boolean)}
+                onCheckedChange={checked => setAgreeTerms(checked as boolean)}
                 required
               />
               <Label
                 htmlFor="terms"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                I agree to the{" "}
+                I agree to the{' '}
                 <Link to="/terms" className="text-primary hover:underline">
                   terms of service
-                </Link>{" "}
-                and{" "}
+                </Link>{' '}
+                and{' '}
                 <Link to="/privacy" className="text-primary hover:underline">
                   privacy policy
                 </Link>
@@ -100,7 +110,13 @@ const Register: React.FC = () => {
               className="w-full flex items-center justify-center gap-2"
               onClick={handleGoogleSignIn}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" className="w-5 h-5">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                width="24"
+                height="24"
+                className="w-5 h-5"
+              >
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -122,7 +138,7 @@ const Register: React.FC = () => {
               Sign up with Google
             </Button>
             <div className="text-center text-sm">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link to="/login" className="font-medium text-primary hover:underline">
                 Sign in
               </Link>
