@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import React, { FormEvent, useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,6 +12,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useApi } from '@/hooks/useApi'
+import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Register: React.FC = () => {
   const [name, setName] = useState('')
@@ -20,13 +24,32 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [agreeTerms, setAgreeTerms] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log({ name, email, password, confirmPassword, agreeTerms })
-  }
-
   const handleGoogleSignIn = () => {
     console.log('Google sign-in clicked')
+  }
+
+  const navigate = useNavigate()
+
+  const { login } = useAuth()
+
+  const {
+    execute: executeRegister,
+    loading,
+    error,
+  } = useApi<AuthResponse, [RegisterData]>(authService.register)
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    console.log('working')
+    e.preventDefault()
+    try {
+      if (password !== confirmPassword) {
+        throw new Error('Passwords not matching')
+      }
+      const credentials = { name, email, password }
+      const response = await executeRegister(credentials)
+      login(response.token, false)
+      navigate('/dashboard')
+    } catch (err) {}
   }
 
   return (
@@ -36,6 +59,12 @@ const Register: React.FC = () => {
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>Enter your information to create an account</CardDescription>
         </CardHeader>
+        {error && (
+          <Alert>
+            <AlertTitle>Heads up!</AlertTitle>
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -102,7 +131,7 @@ const Register: React.FC = () => {
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full">
-              Create account
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
             <Button
               type="button"
