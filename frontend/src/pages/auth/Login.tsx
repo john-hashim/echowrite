@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,20 +12,38 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
+import { useNavigate } from 'react-router-dom'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+
+import { useApi } from '@/hooks/useApi'
+import { authService, LoginCredentials, AuthResponse } from '@/api/services/auth'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const navigate = useNavigate()
+  const { login } = useAuth()
+
+  const {
+    execute: executeLogin,
+    loading,
+    error,
+  } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log({ email, password, rememberMe })
-    // Add your login logic here
+    try {
+      const credentials = { email, password }
+      const response = await executeLogin(credentials)
+      login(response.token, rememberMe)
+      navigate('/dashboard')
+    } catch (err) {}
   }
 
   const handleGoogleSignIn = () => {
-    // Implement Google Sign-in logic here
     console.log('Google sign-in clicked')
   }
 
@@ -38,6 +56,12 @@ const Login: React.FC = () => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
+            {error && (
+              <Alert>
+                <AlertTitle>Heads up!</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -83,8 +107,8 @@ const Login: React.FC = () => {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              Sign in
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign in'}
             </Button>
             <Button
               type="button"
