@@ -154,9 +154,8 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
   try {
     // Get session from request (set by authenticateToken middleware)
     const session = req.session;
-
     if (!session) {
-      return res.status(400).json({ message: "No active session" });
+      return res.status(400).json({ success: true });
     }
 
     // Delete the session
@@ -164,10 +163,10 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
       where: { id: session.id },
     });
 
-    return res.status(200).json({ message: "Logged out successfully" });
+    return res.status(200).json({ success: true });
   } catch (error) {
     console.error("Logout error:", error);
-    return res.status(500).json({ message: "Error logging out" });
+    return res.status(500).json({ success: false });
   }
 };
 

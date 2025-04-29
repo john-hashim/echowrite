@@ -15,7 +15,8 @@ const apiClient: AxiosInstance = axios.create({
 // Request interceptor for adding auth token
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token')
+    console.log(token)
     if (token && config.headers) {
       config.headers.Authorization = `token ${token}`
     }
@@ -32,6 +33,7 @@ apiClient.interceptors.response.use(
       const isLoginEndpoint = error.config?.url?.includes('/auth/login')
       if (!isLoginEndpoint) {
         localStorage.removeItem('token')
+        sessionStorage.removeItem('token')
       }
     }
     return Promise.reject(error)
