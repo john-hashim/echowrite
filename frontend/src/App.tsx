@@ -74,7 +74,16 @@ function AppRoutes() {
           )
         }
       />
-
+      <Route
+        path="/verify-email"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            routes.find(r => r.path === '/verify-email')?.element
+          )
+        }
+      />
       {/* Add other protected routes in a similar way */}
 
       <Route path="*" element={<Navigate to="/" replace />} />
