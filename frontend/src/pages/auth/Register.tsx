@@ -59,12 +59,6 @@ const Register: React.FC = () => {
           <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
           <CardDescription>Enter your information to create an account</CardDescription>
         </CardHeader>
-        {error && (
-          <Alert>
-            <AlertTitle>Heads up!</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
@@ -74,7 +68,6 @@ const Register: React.FC = () => {
                 placeholder="John Doe"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                required
               />
             </div>
             <div className="space-y-2">
@@ -85,7 +78,6 @@ const Register: React.FC = () => {
                 placeholder="m@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                required
               />
             </div>
             <div className="space-y-2">
@@ -104,7 +96,6 @@ const Register: React.FC = () => {
                 type="password"
                 value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
-                required
               />
             </div>
             <div className="flex items-center space-x-2 mb-4">
@@ -112,7 +103,6 @@ const Register: React.FC = () => {
                 id="terms"
                 checked={agreeTerms}
                 onCheckedChange={checked => setAgreeTerms(checked as boolean)}
-                required
               />
               <Label
                 htmlFor="terms"
@@ -128,6 +118,12 @@ const Register: React.FC = () => {
                 </Link>
               </Label>
             </div>
+            {error && (
+              <Alert className="my-2">
+                <AlertTitle>Heads up!</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full">

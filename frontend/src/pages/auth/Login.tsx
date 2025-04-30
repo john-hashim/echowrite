@@ -18,11 +18,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useApi } from '@/hooks/useApi'
 import { authService, LoginCredentials, AuthResponse } from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
+import { Spinner } from '@/components/ui/spinner'
+import { useTheme } from '@/contexts/theme-provider'
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [rememberMe, setRememberMe] = useState(false)
+  const [validationError, setValidationError] = useState<string | null>(null)
+  const [clicked, setClicked] = useState(false)
 
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -34,7 +38,21 @@ const Login: React.FC = () => {
   } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    setClicked(true)
+    setTimeout(() => {
+      setClicked(false)
+    }, 500)
     e.preventDefault()
+
+    // Clear previous validation error
+    setValidationError(null)
+
+    // Check if email or password is empty
+    if (!email || !password) {
+      setValidationError('Email and password are required')
+      return
+    }
+
     try {
       const credentials = { email, password }
       const response = await executeLogin(credentials)
@@ -56,12 +74,6 @@ const Login: React.FC = () => {
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
-            {error && (
-              <Alert>
-                <AlertTitle>Heads up!</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -70,7 +82,7 @@ const Login: React.FC = () => {
                 placeholder="m@example.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                required
+                disabled={loading || clicked}
               />
             </div>
             <div className="space-y-2">
@@ -88,7 +100,7 @@ const Login: React.FC = () => {
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
-                required
+                disabled={loading || clicked}
               />
             </div>
             <div className="space-y-2"></div>
@@ -105,10 +117,26 @@ const Login: React.FC = () => {
                 Remember me
               </Label>
             </div>
+            {/* Error message container with fixed height to prevent flickering */}
+            <div className="min-h-20">
+              {validationError && !clicked && (
+                <Alert className="my-4">
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{validationError}</AlertDescription>
+                </Alert>
+              )}
+              {error && !validationError && !clicked && (
+                <Alert className="my-4">
+                  <AlertTitle>Oops!</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign in'}
+              {(loading || clicked) && <Spinner className="dark:text-black text-white" />}
+              Signin
             </Button>
             <Button
               type="button"

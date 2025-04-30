@@ -33,7 +33,7 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
     async (...args: P): Promise<T> => {
       try {
         setLoading(true)
-        setError(null)
+        // setError(null)
         const response = await apiFunc(...args)
         setData(response.data)
         return response.data
