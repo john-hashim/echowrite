@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -16,20 +16,33 @@ import { useApi } from '@/hooks/useApi'
 import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { useAuth } from '@/contexts/AuthContext'
+import { Spinner } from '@/components/ui/spinner'
 
 const Register: React.FC = () => {
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [agreeTerms, setAgreeTerms] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    agreeTerms: false,
+  })
+
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    agreeTerms: '',
+    server: '',
+  })
+
+  const [clicked, setClicked] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleGoogleSignIn = () => {
     console.log('Google sign-in clicked')
   }
 
   const navigate = useNavigate()
-
   const { login } = useAuth()
 
   const {
@@ -38,96 +51,388 @@ const Register: React.FC = () => {
     error,
   } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    console.log('working')
-    e.preventDefault()
-    try {
-      if (password !== confirmPassword) {
-        throw new Error('Passwords not matching')
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return emailRegex.test(email)
+  }
+
+  // Handle input changes
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
+    const newValue = type === 'checkbox' ? checked : value
+
+    // Update form data with new value
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue,
+    }))
+
+    // Check if the field is now empty and set appropriate error
+    if (name === 'name' && !value.trim()) {
+      setErrors(prev => ({
+        ...prev,
+        name: 'Name is required',
+      }))
+    } else if (name === 'email') {
+      if (!value.trim()) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'Email is required',
+        }))
+      } else if (!isValidEmail(value)) {
+        setErrors(prev => ({
+          ...prev,
+          email: 'Please enter a valid email address',
+        }))
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          email: '',
+        }))
       }
-      const credentials = { name, email, password }
+    } else if (name === 'password') {
+      if (!value) {
+        setErrors(prev => ({
+          ...prev,
+          password: 'Password is required',
+        }))
+      } else if (value.length < 6) {
+        setErrors(prev => ({
+          ...prev,
+          password: 'Password must be at least 6 characters',
+        }))
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          password: '',
+        }))
+      }
+    } else if (name === 'agreeTerms') {
+      if (!checked) {
+        setErrors(prev => ({
+          ...prev,
+          agreeTerms: 'You must agree to the terms and conditions',
+        }))
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          agreeTerms: '',
+        }))
+      }
+    } else {
+      // Clear error for this field if it's valid
+      setErrors(prev => ({
+        ...prev,
+        [name]: '',
+      }))
+    }
+  }
+
+  // Handle field blur for validation
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { name } = e.target
+    validateField(name)
+  }
+
+  // Validate a specific field
+  const validateField = (fieldName: string, value?: any) => {
+    let newErrors = { ...errors }
+
+    // Use the passed value if provided, otherwise use the value from formData
+    const data = {
+      ...formData,
+      [fieldName]: value !== undefined ? value : formData[fieldName as keyof typeof formData],
+    }
+
+    switch (fieldName) {
+      case 'name':
+        if (!data.name.trim()) {
+          newErrors.name = 'Name is required'
+        } else {
+          newErrors.name = ''
+        }
+        break
+      case 'email':
+        if (!data.email.trim()) {
+          newErrors.email = 'Email is required'
+        } else if (!isValidEmail(data.email)) {
+          newErrors.email = 'Please enter a valid email address'
+        } else {
+          newErrors.email = ''
+        }
+        break
+      case 'password':
+        if (!data.password) {
+          newErrors.password = 'Password is required'
+        } else if (data.password.length < 6) {
+          newErrors.password = 'Password must be at least 6 characters'
+        } else {
+          newErrors.password = ''
+        }
+        break
+      case 'agreeTerms':
+        if (!data.agreeTerms) {
+          newErrors.agreeTerms = 'You must agree to the terms and conditions'
+        } else {
+          newErrors.agreeTerms = ''
+        }
+        break
+      default:
+        break
+    }
+
+    setErrors(newErrors)
+    return !newErrors[fieldName as keyof typeof newErrors]
+  }
+
+  // Validate all fields
+  const validateForm = () => {
+    // Create a new errors object to hold all validation errors
+    let newErrors = { ...errors }
+    let isValid = true
+
+    // Validate name
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required'
+      isValid = false
+    } else {
+      newErrors.name = ''
+    }
+
+    // Validate email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required'
+      isValid = false
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address'
+      isValid = false
+    } else {
+      newErrors.email = ''
+    }
+
+    // Validate password
+    if (!formData.password) {
+      newErrors.password = 'Password is required'
+      isValid = false
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters'
+      isValid = false
+    } else {
+      newErrors.password = ''
+    }
+
+    // Validate terms agreement
+    if (!formData.agreeTerms) {
+      newErrors.agreeTerms = 'You must agree to the terms and conditions'
+      isValid = false
+    } else {
+      newErrors.agreeTerms = ''
+    }
+
+    // Update all errors at once
+    setErrors(newErrors)
+    return isValid
+  }
+
+  useEffect(() => {
+    if (error) {
+      setFormData({
+        name: '',
+        email: '',
+        password: '',
+        agreeTerms: false,
+      })
+
+      setErrors(prev => ({
+        ...prev,
+        server: error,
+      }))
+    }
+  }, [error])
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setClicked(true)
+    setFormSubmitted(true) // Mark the form as submitted to show errors
+    setTimeout(() => {
+      setClicked(false)
+    }, 200)
+
+    // Validate all fields and show all errors immediately
+    const isValid = validateForm()
+    if (!isValid) {
+      return
+    }
+
+    try {
+      const credentials = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      }
       const response = await executeRegister(credentials)
       login(response.token, false)
       navigate('/dashboard')
-    } catch (err) {}
+    } catch (err) {
+      // Error is already handled by useApi hook
+    }
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <Card className="w-full max-w-md shadow-sm">
+        <CardHeader className="space-y-0.5 pb-4">
+          <CardTitle className="text-xl font-bold">Create an account</CardTitle>
           <CardDescription>Enter your information to create an account</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent className="space-y-3">
+            <div className="space-y-1">
               <Label htmlFor="name">Full Name</Label>
               <Input
                 id="name"
+                name="name"
                 placeholder="John Doe"
-                value={name}
-                onChange={e => setName(e.target.value)}
+                value={formData.name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={loading || clicked}
+                className={formSubmitted && errors.name ? 'border-red-500' : ''}
               />
+              <div className="h-4">
+                {formSubmitted && errors.name && (
+                  <p className="text-red-500 text-xs">{errors.name}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="m@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                disabled={loading || clicked}
+                className={formSubmitted && errors.email ? 'border-red-500' : ''}
               />
+              <div className="h-4">
+                {formSubmitted && errors.email && (
+                  <p className="text-red-500 text-xs">{errors.email}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-1">
               <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  disabled={loading || clicked}
+                  className={formSubmitted && errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+              <div className="h-4">
+                {formSubmitted && errors.password && (
+                  <p className="text-red-500 text-xs">{errors.password}</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm Password</Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
+
+            <div className="flex items-center mb-2">
+              <div className="flex h-5 items-center pt-0.5">
+                <Checkbox
+                  id="agreeTerms"
+                  name="agreeTerms"
+                  checked={formData.agreeTerms}
+                  onCheckedChange={checked => {
+                    setFormData(prev => ({ ...prev, agreeTerms: checked as boolean }))
+                    if (checked) {
+                      setErrors(prev => ({ ...prev, agreeTerms: '' }))
+                    } else if (formSubmitted) {
+                      setErrors(prev => ({
+                        ...prev,
+                        agreeTerms: 'You must agree to the terms and conditions',
+                      }))
+                    }
+                  }}
+                  className={formSubmitted && errors.agreeTerms ? 'border-red-500' : ''}
+                />
+              </div>
+              <div className="ml-2">
+                <Label
+                  htmlFor="agreeTerms"
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I agree to the{' '}
+                  <Link to="/terms" className="text-primary hover:underline">
+                    terms of service
+                  </Link>{' '}
+                  and{' '}
+                  <Link to="/privacy" className="text-primary hover:underline">
+                    privacy policy
+                  </Link>
+                </Label>
+              </div>
             </div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Checkbox
-                id="terms"
-                checked={agreeTerms}
-                onCheckedChange={checked => setAgreeTerms(checked as boolean)}
-              />
-              <Label
-                htmlFor="terms"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                I agree to the{' '}
-                <Link to="/terms" className="text-primary hover:underline">
-                  terms of service
-                </Link>{' '}
-                and{' '}
-                <Link to="/privacy" className="text-primary hover:underline">
-                  privacy policy
-                </Link>
-              </Label>
-            </div>
-            {error && (
+
+            {errors.server && (
               <Alert className="my-2">
-                <AlertTitle>Heads up!</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertTitle>Oops!</AlertTitle>
+                <AlertDescription>{errors.server}</AlertDescription>
               </Alert>
             )}
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">
-              {loading ? 'Creating account...' : 'Create Account'}
+          <CardFooter className="flex flex-col space-y-3 pt-3">
+            <Button type="submit" className="w-full" disabled={loading || clicked}>
+              {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
+              Sign up
             </Button>
             <Button
               type="button"
@@ -162,7 +467,7 @@ const Register: React.FC = () => {
               </svg>
               Sign up with Google
             </Button>
-            <div className="text-center text-sm">
+            <div className="text-center text-sm pt-1">
               Already have an account?{' '}
               <Link to="/login" className="font-medium text-primary hover:underline">
                 Sign in

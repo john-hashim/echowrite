@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -19,14 +19,23 @@ import { useApi } from '@/hooks/useApi'
 import { authService, LoginCredentials, AuthResponse } from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
-import { useTheme } from '@/contexts/theme-provider'
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [rememberMe, setRememberMe] = useState(false)
-  const [validationError, setValidationError] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false,
+  })
+
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    server: '',
+  })
+
   const [clicked, setClicked] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -37,28 +46,110 @@ const Login: React.FC = () => {
     error,
   } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
 
+  useEffect(() => {
+    if (error) {
+      setFormData(prev => ({
+        ...prev,
+        password: '',
+      }))
+
+      setErrors(prev => ({
+        ...prev,
+        server: error,
+      }))
+    }
+  }, [error])
+
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return emailRegex.test(email)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target
+    const newValue = type === 'checkbox' ? checked : value
+
+    // Update form data
+    setFormData(prev => ({
+      ...prev,
+      [name]: newValue,
+    }))
+
+    // Clear error as user types
+    setErrors(prev => ({
+      ...prev,
+      [name]: '',
+    }))
+  }
+
+  const validateForm = () => {
+    let newErrors = { ...errors }
+    let isValid = true
+    let validationMessage = ''
+
+    // Validate email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required'
+      validationMessage = 'Email is required'
+      isValid = false
+    } else if (!isValidEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address'
+      validationMessage = 'Please enter a valid email address'
+      isValid = false
+    } else {
+      newErrors.email = ''
+    }
+
+    // Validate password
+    if (!formData.password) {
+      newErrors.password = 'Password is required'
+      validationMessage = validationMessage
+        ? validationMessage + ' and password is required'
+        : 'Password is required'
+      isValid = false
+    } else {
+      newErrors.password = ''
+    }
+
+    // Set the server error to show validation message
+    if (!isValid) {
+      newErrors.server = validationMessage
+    }
+
+    setErrors(newErrors)
+    return isValid
+  }
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
     setClicked(true)
+    setFormSubmitted(true)
+
+    // Clear previous server error
+    setErrors(prev => ({
+      ...prev,
+      server: '',
+    }))
+
     setTimeout(() => {
       setClicked(false)
-    }, 500)
-    e.preventDefault()
+    }, 200)
 
-    // Clear previous validation error
-    setValidationError(null)
-
-    // Check if email or password is empty
-    if (!email || !password) {
-      setValidationError('Email and password are required')
+    // Validate form
+    const isValid = validateForm()
+    if (!isValid) {
       return
     }
 
     try {
-      const credentials = { email, password }
+      const credentials = { email: formData.email, password: formData.password }
       const response = await executeLogin(credentials)
-      login(response.token, rememberMe)
+      login(response.token, formData.rememberMe)
       navigate('/dashboard')
-    } catch (err) {}
+    } catch (err) {
+      // Error is handled by useApi hook
+    }
   }
 
   const handleGoogleSignIn = () => {
@@ -66,26 +157,47 @@ const Login: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Login</CardTitle>
+    <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
+      <Card className="w-full max-w-md shadow-sm">
+        <CardHeader className="space-y-0.5 pb-4">
+          <CardTitle className="text-xl font-bold">Login</CardTitle>
           <CardDescription>Enter your credentials to access your account</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
+          <CardContent className="space-y-3">
+            <div className="space-y-1">
               <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="m@example.com"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                disabled={loading || clicked}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                </div>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="m@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  disabled={loading || clicked}
+                  className={`pl-10 }`}
+                />
+              </div>
             </div>
-            <div className="space-y-2">
+
+            <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
                 <Link
@@ -95,48 +207,111 @@ const Login: React.FC = () => {
                   Forgot password?
                 </Link>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                disabled={loading || clicked}
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                </div>
+                <Input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={formData.password}
+                  onChange={handleChange}
+                  disabled={loading || clicked}
+                  className={`pl-10 pr-10`}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
-            <div className="space-y-2"></div>
-            <div className="flex items-center space-x-2 mb-4">
+
+            <div className="flex items-center space-x-2 mb-0">
               <Checkbox
-                id="remember"
-                checked={rememberMe}
-                onCheckedChange={checked => setRememberMe(checked as boolean)}
+                id="rememberMe"
+                name="rememberMe"
+                checked={formData.rememberMe}
+                onCheckedChange={checked => {
+                  setFormData(prev => ({
+                    ...prev,
+                    rememberMe: checked as boolean,
+                  }))
+                }}
               />
               <Label
-                htmlFor="remember"
+                htmlFor="rememberMe"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Remember me
               </Label>
             </div>
-            {/* Error message container with fixed height to prevent flickering */}
-            <div className="min-h-20">
-              {validationError && !clicked && (
-                <Alert className="my-4">
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{validationError}</AlertDescription>
+
+            <div className="min-h-20 flex items-center">
+              {formSubmitted && errors.server && (
+                <Alert>
+                  <AlertTitle>Oops!</AlertTitle>
+                  <AlertDescription>{errors.server}</AlertDescription>
                 </Alert>
               )}
-              {error && !validationError && !clicked && (
-                <Alert className="my-4">
+              {error && !errors.server && (
+                <Alert>
                   <AlertTitle>Oops!</AlertTitle>
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
-              {(loading || clicked) && <Spinner className="dark:text-black text-white" />}
-              Signin
+          <CardFooter className="flex flex-col space-y-3 pt-1">
+            <Button type="submit" className="w-full" disabled={loading || clicked}>
+              {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
+              Sign in
             </Button>
             <Button
               type="button"
@@ -171,7 +346,7 @@ const Login: React.FC = () => {
               </svg>
               Sign in with Google
             </Button>
-            <div className="text-center text-sm">
+            <div className="text-center text-sm pt-1">
               Don't have an account?{' '}
               <Link to="/register" className="font-medium text-primary hover:underline">
                 Sign up
