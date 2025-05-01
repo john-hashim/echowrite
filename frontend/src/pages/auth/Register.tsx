@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,10 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useApi } from '@/hooks/useApi'
-import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Spinner } from '@/components/ui/spinner'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -33,7 +30,6 @@ const Register: React.FC = () => {
     server: '',
   })
 
-  const [clicked, setClicked] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
 
@@ -42,12 +38,6 @@ const Register: React.FC = () => {
   }
 
   const navigate = useNavigate()
-
-  const {
-    execute: executeRegister,
-    loading,
-    error,
-  } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex =
@@ -233,29 +223,9 @@ const Register: React.FC = () => {
     return isValid
   }
 
-  useEffect(() => {
-    if (error) {
-      setFormData({
-        name: '',
-        email: '',
-        password: '',
-        agreeTerms: false,
-      })
-
-      setErrors(prev => ({
-        ...prev,
-        server: error,
-      }))
-    }
-  }, [error])
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setClicked(true)
     setFormSubmitted(true) // Mark the form as submitted to show errors
-    setTimeout(() => {
-      setClicked(false)
-    }, 200)
 
     // Validate all fields and show all errors immediately
     const isValid = validateForm()
@@ -301,7 +271,6 @@ const Register: React.FC = () => {
                 value={formData.name}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={loading || clicked}
                 className={formSubmitted && errors.name ? 'border-red-500' : ''}
               />
               <div className="h-4">
@@ -321,7 +290,6 @@ const Register: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                disabled={loading || clicked}
                 className={formSubmitted && errors.email ? 'border-red-500' : ''}
               />
               <div className="h-4">
@@ -341,12 +309,11 @@ const Register: React.FC = () => {
                   value={formData.password}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  disabled={loading || clicked}
                   className={formSubmitted && errors.password ? 'border-red-500 pr-10' : 'pr-10'}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
+                  className="absolute cursor-pointer inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -434,8 +401,7 @@ const Register: React.FC = () => {
             )}
           </CardContent>
           <CardFooter className="flex flex-col space-y-3 pt-3">
-            <Button type="submit" className="w-full" disabled={loading || clicked}>
-              {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
+            <Button type="submit" className="w-full">
               Sign up
             </Button>
             <Button

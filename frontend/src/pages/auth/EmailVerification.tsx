@@ -25,11 +25,7 @@ const EmailVerification: React.FC = () => {
   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationError, setVerificationError] = useState('')
 
-  const {
-    execute: executeRegister,
-    loading,
-    error,
-  } = useApi<AuthResponse, [RegisterData]>(authService.register)
+  const { execute: executeRegister } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   // Get the location state containing the email and credentials
   const location = useLocation()
@@ -124,7 +120,6 @@ const EmailVerification: React.FC = () => {
 
     setIsVerifying(true)
     setVerificationError('')
-    console.log(userCredentials)
     try {
       // Construct the OTP from the array
       const otpCode = otp.join('')
@@ -132,14 +127,11 @@ const EmailVerification: React.FC = () => {
       // Call your verification API here
       // For example:
       // await authService.verifyEmail({ email: userEmail, otp: otpCode })
-      console.log('working')
-      throw new Error('Simulated network error during verification')
-
+      throw new Error()
       const response = await executeRegister(userCredentials)
       login(response.token, false)
       navigate('/dashboard')
     } catch (error) {
-      console.error('Verification error:', error)
       setVerificationError('Invalid verification code. Please try again.')
       // Reset OTP fields for retry
       setOtp(Array(6).fill(''))
@@ -149,7 +141,26 @@ const EmailVerification: React.FC = () => {
     }
   }
 
-  const handleResendOtp = async () => {}
+  const handleResendOtp = async () => {
+    if (isResending || resendCountdown > 0) return
+
+    setIsResending(true)
+    setVerificationError('')
+
+    try {
+      // Call your resend OTP API here
+      // For example:
+      // await authService.resendVerificationCode({ email: userEmail })
+
+      // Set countdown for resend button
+      setResendCountdown(60)
+    } catch (error) {
+      console.error('Error resending code:', error)
+      setVerificationError('Failed to resend code. Please try again.')
+    } finally {
+      setIsResending(false)
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
@@ -198,6 +209,11 @@ const EmailVerification: React.FC = () => {
                 </div>
               ))}
           </div>
+          {verificationError && (
+            <div className="mt-2 rounded-md bg-destructive/10 p-3 text-center text-sm text-destructive">
+              <p>{verificationError}</p>
+            </div>
+          )}
 
           <div className="text-center text-sm text-muted-foreground">
             <p>Didn't receive the email? Check your spam folder or request a new code.</p>
