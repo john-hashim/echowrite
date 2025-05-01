@@ -22,7 +22,7 @@ const EmailVerification: React.FC = () => {
   const [isResending, setIsResending] = useState(false)
   const [resendCountdown, setResendCountdown] = useState(0)
 
-  const [isVerifying, setIsVerifying] = useState(false)
+  //   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationError, setVerificationError] = useState('')
 
   const { execute: executeRegister } = useApi<AuthResponse, [RegisterData]>(authService.register)
@@ -118,16 +118,15 @@ const EmailVerification: React.FC = () => {
   const handleVerify = async () => {
     if (!isComplete || !userCredentials) return
 
-    setIsVerifying(true)
+    // setIsVerifying(true)
     setVerificationError('')
     try {
       // Construct the OTP from the array
-      const otpCode = otp.join('')
+      //   const otpCode = otp.join('')
 
       // Call your verification API here
       // For example:
       // await authService.verifyEmail({ email: userEmail, otp: otpCode })
-      throw new Error()
       const response = await executeRegister(userCredentials)
       login(response.token, false)
       navigate('/dashboard')
@@ -137,7 +136,7 @@ const EmailVerification: React.FC = () => {
       setOtp(Array(6).fill(''))
       inputRefs.current[0]?.focus()
     } finally {
-      setIsVerifying(false)
+      //   setIsVerifying(false)
     }
   }
 
