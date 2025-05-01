@@ -11,12 +11,34 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Loader2, CheckCircle2, Mail } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
+import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
+import { useApi } from '@/hooks/useApi'
 
 const EmailVerification: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
   const [isComplete, setIsComplete] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const [resendCountdown, setResendCountdown] = useState(0)
+
+  const [isVerifying, setIsVerifying] = useState(false)
+  const [verificationError, setVerificationError] = useState('')
+
+  const {
+    execute: executeRegister,
+    loading,
+    error,
+  } = useApi<AuthResponse, [RegisterData]>(authService.register)
+
+  // Get the location state containing the email and credentials
+  const location = useLocation()
+  const navigate = useNavigate()
+  const { login } = useAuth()
+
+  const state = location.state
+  const userEmail = state?.email || ''
+  const userCredentials = state?.credentials
 
   // Create an array of refs using useRef
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
@@ -97,7 +119,35 @@ const EmailVerification: React.FC = () => {
     }
   }
 
-  const handleVerify = () => {}
+  const handleVerify = async () => {
+    if (!isComplete || !userCredentials) return
+
+    setIsVerifying(true)
+    setVerificationError('')
+    console.log(userCredentials)
+    try {
+      // Construct the OTP from the array
+      const otpCode = otp.join('')
+
+      // Call your verification API here
+      // For example:
+      // await authService.verifyEmail({ email: userEmail, otp: otpCode })
+      console.log('working')
+      throw new Error('Simulated network error during verification')
+
+      const response = await executeRegister(userCredentials)
+      login(response.token, false)
+      navigate('/dashboard')
+    } catch (error) {
+      console.error('Verification error:', error)
+      setVerificationError('Invalid verification code. Please try again.')
+      // Reset OTP fields for retry
+      setOtp(Array(6).fill(''))
+      inputRefs.current[0]?.focus()
+    } finally {
+      setIsVerifying(false)
+    }
+  }
 
   const handleResendOtp = async () => {}
 
@@ -116,8 +166,8 @@ const EmailVerification: React.FC = () => {
         <CardContent className="space-y-4">
           <div className="text-center text-sm">
             <p>
-              Please check <span className="font-medium">johnhashim10@gmail.com</span> and enter the
-              6-digit code below to complete your registration.
+              Please check <span className="font-medium">{userEmail}</span> and enter the 6-digit
+              code below to complete your registration.
             </p>
           </div>
 

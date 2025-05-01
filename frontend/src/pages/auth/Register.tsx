@@ -15,7 +15,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { useApi } from '@/hooks/useApi'
 import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 
 const Register: React.FC = () => {
@@ -43,7 +42,6 @@ const Register: React.FC = () => {
   }
 
   const navigate = useNavigate()
-  const { login } = useAuth()
 
   const {
     execute: executeRegister,
@@ -271,9 +269,15 @@ const Register: React.FC = () => {
         email: formData.email,
         password: formData.password,
       }
-      const response = await executeRegister(credentials)
-      login(response.token, false)
-      navigate('/dashboard')
+      // const response = await executeRegister(credentials)
+      // login(response.token, false)
+      // navigate('/dashboard')
+      navigate('/verify-email', {
+        state: {
+          email: formData.email,
+          credentials: credentials, // Pass credentials to use after verification
+        },
+      })
     } catch (err) {
       // Error is already handled by useApi hook
     }
