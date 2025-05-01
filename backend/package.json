@@ -9,7 +9,9 @@
     "build": "tsc",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate deploy",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "format": "prettier --write \"src/**/*.ts\" \"*.{js,json,ts}\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"*.{js,json,ts}\""
   },
   "keywords": [
     "sass",
@@ -37,6 +39,7 @@
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.11.16",
+    "prettier": "3.5.3",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.3.3"
   }

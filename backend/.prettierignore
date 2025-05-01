@@ -1,0 +1,15 @@
+# Ignore dependencies
+node_modules
+
+# Ignore build output (if you have one, e.g., a 'dist' folder)
+# dist
+
+# Ignore environment files
+.env
+
+# Ignore lock files (optional, as Prettier doesn't usually format them anyway)
+package-lock.json
+# yarn.lock
+
+# Ignore generated files (if applicable)
+src/generated

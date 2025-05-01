@@ -1,13 +1,13 @@
 // src/middleware/auth.middleware.ts
-import { Request, Response, NextFunction } from "express";
-import { prisma } from "../prisma/client";
+import { Request, Response, NextFunction } from 'express'
+import { prisma } from '../prisma/client'
 
 // Extend Express Request type
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
-      session?: any;
+      user?: any
+      session?: any
     }
   }
 }
@@ -21,26 +21,26 @@ export const authenticateToken = async (
   next: NextFunction
 ): Promise<any> => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
 
     if (!token) {
-      return res.status(401).json({ message: "Authentication required" });
+      return res.status(401).json({ message: 'Authentication required' })
     }
 
     // Find the session
     const session = await prisma.session.findUnique({
       where: { token },
       include: { user: true },
-    });
+    })
 
     // Check if session exists and is not expired
     if (!session || new Date() > session.expiresAt) {
       if (session) {
         // Clean up expired session
-        await prisma.session.delete({ where: { id: session.id } });
+        await prisma.session.delete({ where: { id: session.id } })
       }
-      return res.status(401).json({ message: "Session expired or invalid" });
+      return res.status(401).json({ message: 'Session expired or invalid' })
     }
 
     // Set user and session in request
@@ -48,37 +48,33 @@ export const authenticateToken = async (
       id: session.user.id,
       email: session.user.email,
       name: session.user.name,
-    };
-    req.session = session;
+    }
+    req.session = session
 
-    next();
+    next()
   } catch (error) {
-    console.error("Authentication error:", error);
-    return res.status(500).json({ message: "Authentication failed" });
+    console.error('Authentication error:', error)
+    return res.status(500).json({ message: 'Authentication failed' })
   }
-};
+}
 
 /**
  * Middleware to check if user exists
  */
-export const userExists = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<any> => {
+export const userExists = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
-    const userId = req.user?.id;
+    const userId = req.user?.id
 
     if (!userId) {
-      return res.status(401).json({ message: "User ID not found in request" });
+      return res.status(401).json({ message: 'User ID not found in request' })
     }
 
     const user = await prisma.user.findUnique({
       where: { id: userId },
-    });
+    })
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' })
     }
 
     // Refresh user data
@@ -86,11 +82,11 @@ export const userExists = async (
       id: user.id,
       email: user.email,
       name: user.name,
-    };
+    }
 
-    next();
+    next()
   } catch (error) {
-    console.error("User exists check error:", error);
-    return res.status(500).json({ message: "Failed to verify user" });
+    console.error('User exists check error:', error)
+    return res.status(500).json({ message: 'Failed to verify user' })
   }
-};
+}
