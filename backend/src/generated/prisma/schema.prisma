@@ -25,6 +25,10 @@ model User {
   updatedAt         DateTime  @updatedAt
   sessions          Session[]
 
+  emailVerified   Boolean   @default(false)
+  verificationOtp String?
+  otpExpiresAt    DateTime?
+
   @@map("users")
 }
 

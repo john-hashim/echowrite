@@ -299,3 +299,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<any> =
     return res.status(500).json({ message: 'Error resetting password' })
   }
 }
+
+export const sendVerificationEmail = async (req: Request, res: Response): Promise<any> => {}
+
+export const verifyOtp = async (req: Request, res: Response): Promise<any> => {}

@@ -125,7 +125,10 @@ exports.Prisma.UserScalarFieldEnum = {
   resetToken: 'resetToken',
   resetTokenExpires: 'resetTokenExpires',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  emailVerified: 'emailVerified',
+  verificationOtp: 'verificationOtp',
+  otpExpiresAt: 'otpExpiresAt'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {

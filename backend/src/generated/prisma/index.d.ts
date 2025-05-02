@@ -1009,6 +1009,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    emailVerified: boolean | null
+    verificationOtp: string | null
+    otpExpiresAt: Date | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1020,6 +1023,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    emailVerified: boolean | null
+    verificationOtp: string | null
+    otpExpiresAt: Date | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1031,6 +1037,9 @@ export namespace Prisma {
     resetTokenExpires: number
     createdAt: number
     updatedAt: number
+    emailVerified: number
+    verificationOtp: number
+    otpExpiresAt: number
     _all: number
   }
 
@@ -1044,6 +1053,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    emailVerified?: true
+    verificationOtp?: true
+    otpExpiresAt?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1055,6 +1067,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    emailVerified?: true
+    verificationOtp?: true
+    otpExpiresAt?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1066,6 +1081,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    emailVerified?: true
+    verificationOtp?: true
+    otpExpiresAt?: true
     _all?: true
   }
 
@@ -1150,6 +1168,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date
     updatedAt: Date
+    emailVerified: boolean
+    verificationOtp: string | null
+    otpExpiresAt: Date | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1178,6 +1199,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    emailVerified?: boolean
+    verificationOtp?: boolean
+    otpExpiresAt?: boolean
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -1191,6 +1215,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    emailVerified?: boolean
+    verificationOtp?: boolean
+    otpExpiresAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1202,6 +1229,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    emailVerified?: boolean
+    verificationOtp?: boolean
+    otpExpiresAt?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1213,9 +1243,12 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    emailVerified?: boolean
+    verificationOtp?: boolean
+    otpExpiresAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt" | "emailVerified" | "verificationOtp" | "otpExpiresAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1237,6 +1270,9 @@ export namespace Prisma {
       resetTokenExpires: Date | null
       createdAt: Date
       updatedAt: Date
+      emailVerified: boolean
+      verificationOtp: string | null
+      otpExpiresAt: Date | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -1669,6 +1705,9 @@ export namespace Prisma {
     readonly resetTokenExpires: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly emailVerified: FieldRef<"User", 'Boolean'>
+    readonly verificationOtp: FieldRef<"User", 'String'>
+    readonly otpExpiresAt: FieldRef<"User", 'DateTime'>
   }
     
 
@@ -3192,7 +3231,10 @@ export namespace Prisma {
     resetToken: 'resetToken',
     resetTokenExpires: 'resetTokenExpires',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    emailVerified: 'emailVerified',
+    verificationOtp: 'verificationOtp',
+    otpExpiresAt: 'otpExpiresAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3268,6 +3310,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -3296,6 +3345,9 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    emailVerified?: BoolFilter<"User"> | boolean
+    verificationOtp?: StringNullableFilter<"User"> | string | null
+    otpExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
     sessions?: SessionListRelationFilter
   }
 
@@ -3308,6 +3360,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    emailVerified?: SortOrder
+    verificationOtp?: SortOrderInput | SortOrder
+    otpExpiresAt?: SortOrderInput | SortOrder
     sessions?: SessionOrderByRelationAggregateInput
   }
 
@@ -3323,6 +3378,9 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    emailVerified?: BoolFilter<"User"> | boolean
+    verificationOtp?: StringNullableFilter<"User"> | string | null
+    otpExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
     sessions?: SessionListRelationFilter
   }, "id" | "email">
 
@@ -3335,6 +3393,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    emailVerified?: SortOrder
+    verificationOtp?: SortOrderInput | SortOrder
+    otpExpiresAt?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -3352,6 +3413,9 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    emailVerified?: BoolWithAggregatesFilter<"User"> | boolean
+    verificationOtp?: StringNullableWithAggregatesFilter<"User"> | string | null
+    otpExpiresAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   }
 
   export type SessionWhereInput = {
@@ -3423,6 +3487,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    emailVerified?: boolean
+    verificationOtp?: string | null
+    otpExpiresAt?: Date | string | null
     sessions?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -3435,6 +3502,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    emailVerified?: boolean
+    verificationOtp?: string | null
+    otpExpiresAt?: Date | string | null
     sessions?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -3447,6 +3517,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUpdateManyWithoutUserNestedInput
   }
 
@@ -3459,6 +3532,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     sessions?: SessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -3471,6 +3547,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    emailVerified?: boolean
+    verificationOtp?: string | null
+    otpExpiresAt?: Date | string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -3482,6 +3561,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3493,6 +3575,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionCreateInput = {
@@ -3609,6 +3694,11 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type SessionListRelationFilter = {
     every?: SessionWhereInput
     some?: SessionWhereInput
@@ -3633,6 +3723,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    emailVerified?: SortOrder
+    verificationOtp?: SortOrder
+    otpExpiresAt?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -3644,6 +3737,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    emailVerified?: SortOrder
+    verificationOtp?: SortOrder
+    otpExpiresAt?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -3655,6 +3751,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    emailVerified?: SortOrder
+    verificationOtp?: SortOrder
+    otpExpiresAt?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -3721,6 +3820,14 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -3781,6 +3888,10 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
   }
 
   export type SessionUpdateManyWithoutUserNestedInput = {
@@ -3875,6 +3986,11 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -3959,6 +4075,14 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type SessionCreateWithoutUserInput = {
     id?: string
     token: string
@@ -4022,6 +4146,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    emailVerified?: boolean
+    verificationOtp?: string | null
+    otpExpiresAt?: Date | string | null
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -4033,6 +4160,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    emailVerified?: boolean
+    verificationOtp?: string | null
+    otpExpiresAt?: Date | string | null
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -4060,6 +4190,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -4071,6 +4204,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    emailVerified?: BoolFieldUpdateOperationsInput | boolean
+    verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
+    otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type SessionCreateManyUserInput = {
