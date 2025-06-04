@@ -3,6 +3,8 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { prisma } from '../prisma/client'
+import { sendVerificationEmailService, verifyOtpService } from '../services/email.service'
+import { SendVerificationEmailRequest } from '../types/auth.types'
 
 interface LoginCredentials {
   email: string
@@ -72,21 +74,30 @@ export const register = async (req: Request, res: Response): Promise<any> => {
         email,
         password: hashedPassword,
         name,
+        emailVerified: false,
       },
     })
 
-    // Create session for new user
-    const session = await createSession(user.id)
+    // Send verification email
+    const emailResult = await sendVerificationEmailService(user.email)
+
+    if (!emailResult.success) {
+      // If email fails, we could either:
+      // 1. Delete the user and return error
+      // 2. Keep user and let them resend later (recommended)
+      console.warn('Failed to send verification email to:', user.email)
+    }
 
     // Return user data and token
     return res.status(201).json({
-      message: 'User registered successfully',
+      message: 'Registration successful! Please check your email for verification.',
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
+        emailVerified: user.emailVerified,
       },
-      token: session.token,
+      emailSent: emailResult.success,
     })
   } catch (error) {
     console.error('Registration error:', error)
@@ -300,6 +311,96 @@ export const resetPassword = async (req: Request, res: Response): Promise<any> =
   }
 }
 
-export const sendVerificationEmail = async (req: Request, res: Response): Promise<any> => {}
+/**
+ * Send verification email (Simplified for registered users)
+ */
+export const sendVerificationEmail = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { email }: SendVerificationEmailRequest = req.body
 
-export const verifyOtp = async (req: Request, res: Response): Promise<any> => {}
+    // Validate input
+    if (!email) {
+      return res.status(400).json({ message: 'Email is required' })
+    }
+
+    // Find existing user
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found. Please register first.' })
+    }
+
+    if (user.emailVerified) {
+      return res.status(400).json({ message: 'Email is already verified' })
+    }
+
+    // Send verification email
+    const result = await sendVerificationEmailService(email.toLowerCase())
+
+    if (!result.success) {
+      return res.status(500).json({ message: result.message })
+    }
+
+    return res.status(200).json({
+      message: 'Verification email sent successfully',
+      email: email.toLowerCase(),
+    })
+  } catch (error) {
+    console.error('Send verification email error:', error)
+    return res.status(500).json({ message: 'Error sending verification email' })
+  }
+}
+
+export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
+  const { email, otp } = req.body
+
+  // Validate input
+  if (!email || !otp) {
+    return res.status(400).json({ message: 'Email and OTP are required' })
+  }
+
+  // Validate OTP format (6 digits)
+  if (!/^\d{6}$/.test(otp)) {
+    return res.status(400).json({ message: 'OTP must be 6 digits' })
+  }
+
+  // Verify OTP
+  const result = await verifyOtpService(email.toLowerCase(), otp)
+
+  if (!result.success) {
+    return res.status(400).json({ message: result.message })
+  }
+
+  // OTP verified successfully - now create session and return token
+  const user = await prisma.user.findUnique({
+    where: { email: email.toLowerCase() },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      emailVerified: true,
+    },
+  })
+
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' })
+  }
+
+  // Create session for the verified user
+  const session = await createSession(user.id)
+
+  // Return success with token - user is now fully registered and logged in
+  return res.status(200).json({
+    message: 'Email verified successfully! You are now logged in.',
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      emailVerified: user.emailVerified,
+    },
+    token: session.token,
+    verified: true,
+  })
+}

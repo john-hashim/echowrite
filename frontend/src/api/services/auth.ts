@@ -23,9 +23,20 @@ export interface UserResponse {
   // Add other user fields as needed
 }
 
+export interface verificationResponce {
+  message: string
+  user: UserResponse
+  token: string
+  verified: boolean
+}
 export interface AuthResponse {
   user: UserResponse
   token: string
+}
+
+export interface verifyOtpParams {
+  email: string
+  otp: string
 }
 
 export const authService = {
@@ -41,7 +52,7 @@ export const authService = {
   /**
    * Register a new user
    * @param userData - User registration data
-   * @returns Promise with user data and token
+   * @returns Promise with user data
    */
   register: (userData: RegisterData): Promise<AxiosResponse<AuthResponse>> => {
     return apiClient.post(ENDPOINTS.AUTH.REGISTER, userData)
@@ -61,5 +72,13 @@ export const authService = {
    */
   getMe: (): Promise<AxiosResponse<UserResponse>> => {
     return apiClient.get(ENDPOINTS.AUTH.GET_ME)
+  },
+
+  /**
+   * Verify Email OTP
+   * @returns Promise with user data and verification status and token
+   */
+  verifyEmail: (data: verifyOtpParams): Promise<AxiosResponse<verificationResponce>> => {
+    return apiClient.post(ENDPOINTS.AUTH.VERIFY_OTP, data)
   },
 }

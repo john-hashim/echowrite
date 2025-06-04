@@ -5,6 +5,7 @@ export const ENDPOINTS = {
     REGISTER: '/auth/register',
     LOGOUT: '/auth/logout',
     GET_ME: '/auth/me',
+    VERIFY_OTP: '/auth/verify-otp',
   },
 } as const
 

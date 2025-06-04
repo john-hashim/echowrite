@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Loader2, CheckCircle2, Mail } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
+import { authService, verificationResponce, verifyOtpParams } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
 
 const EmailVerification: React.FC = () => {
@@ -24,8 +24,6 @@ const EmailVerification: React.FC = () => {
 
   //   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationError, setVerificationError] = useState('')
-
-  const { execute: executeRegister } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   // Get the location state containing the email and credentials
   const location = useLocation()
@@ -38,6 +36,10 @@ const EmailVerification: React.FC = () => {
 
   // Create an array of refs using useRef
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
+
+  const { execute: executeVerifyEmail } = useApi<verificationResponce, [verifyOtpParams]>(
+    authService.verifyEmail
+  )
 
   // Initialize the refs array
   if (!inputRefs.current) {
@@ -122,12 +124,12 @@ const EmailVerification: React.FC = () => {
     setVerificationError('')
     try {
       // Construct the OTP from the array
-      //   const otpCode = otp.join('')
+      const otpCode = otp.join('')
 
-      // Call your verification API here
-      // For example:
-      // await authService.verifyEmail({ email: userEmail, otp: otpCode })
-      const response = await executeRegister(userCredentials)
+      const response = await executeVerifyEmail({ email: userEmail, otp: otpCode })
+      if (!response) {
+        console.log('verification problem')
+      }
       login(response.token, false)
       navigate('/dashboard')
     } catch (error) {

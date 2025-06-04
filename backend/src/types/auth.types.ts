@@ -31,3 +31,11 @@ export interface TokenPayload {
   userId: string
   email: string
 }
+export interface SendVerificationEmailRequest {
+  email: string
+}
+
+export interface VerifyOtpRequest {
+  email: string
+  otp: string
+}

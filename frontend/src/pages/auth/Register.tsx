@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
+import { useApi } from '@/hooks/useApi'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -38,6 +40,8 @@ const Register: React.FC = () => {
   }
 
   const navigate = useNavigate()
+
+  const { execute: executeRegister } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex =
@@ -239,13 +243,16 @@ const Register: React.FC = () => {
         email: formData.email,
         password: formData.password,
       }
-      // const response = await executeRegister(credentials)
+      const response = await executeRegister(credentials)
       // login(response.token, false)
       // navigate('/dashboard')
+      if (!response) {
+        console.log('Register Error')
+      }
       navigate('/verify-email', {
         state: {
           email: formData.email,
-          credentials: credentials, // Pass credentials to use after verification
+          credentials: credentials,
         },
       })
     } catch (err) {

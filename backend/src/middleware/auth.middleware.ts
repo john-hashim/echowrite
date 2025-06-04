@@ -90,3 +90,34 @@ export const userExists = async (req: Request, res: Response, next: NextFunction
     return res.status(500).json({ message: 'Failed to verify user' })
   }
 }
+
+export const requireEmailVerification = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<any> => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Authentication required' })
+    }
+    // Get fresh user data to check verification status
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.id },
+      select: { emailVerified: true, email: true },
+    })
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        message: 'Please verify your email to access this feature',
+        needsEmailVerification: true,
+        email: user.email,
+      })
+    }
+    next()
+  } catch (error) {
+    console.error('Email verification check error:', error)
+    return res.status(500).json({ message: 'Failed to verify email status' })
+  }
+}
