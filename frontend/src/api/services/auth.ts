@@ -46,6 +46,7 @@ export interface verifyOtpParams {
 export interface EmailVerificationSendApiResponce {
   success: boolean
   message: string
+  emailVerified?: boolean
 }
 
 export const authService = {

@@ -46,9 +46,11 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const { execute: executeRegister, error: registerError } = useApi<AuthResponse, [RegisterData]>(
-    authService.register
-  )
+  const {
+    execute: executeRegister,
+    error: registerError,
+    errorData,
+  } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   const { execute: executeEmailVerification, error: emailVerifyApiError } = useApi<
     EmailVerificationSendApiResponce,
@@ -442,12 +444,14 @@ const Register: React.FC = () => {
               <Alert className="my-2">
                 <AlertTitle>Oops!</AlertTitle>
                 <AlertDescription>{errors.server}</AlertDescription>
-                <div
-                  className="cursor-pointer"
-                  onClick={() => handleVerification(formData.email, true)}
-                >
-                  verify
-                </div>
+                {!errorData?.emailVerified && (
+                  <div
+                    className="cursor-pointer"
+                    onClick={() => handleVerification(formData.email, true)}
+                  >
+                    verify
+                  </div>
+                )}
               </Alert>
             )}
           </CardContent>

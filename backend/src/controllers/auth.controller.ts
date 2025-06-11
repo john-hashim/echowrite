@@ -63,14 +63,10 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 
     if (existingUser) {
       if (!existingUser.emailVerified) {
-        // // Optionally resend verification email
-        // const emailResult = await sendVerificationEmailService(existingUser.email)
-
         return res.status(409).json({
           message: 'Account exists but email not verified',
           emailVerified: false,
-          // emailSent: emailResult.success,
-          action: 'verify-email', // This tells frontend what action to take
+          action: 'verify-email',
         })
       }
       return res.status(409).json({ message: 'User already exists' })
@@ -143,8 +139,13 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
-    // Clean up any existing sessions for this user (optional)
-    // await prisma.session.deleteMany({ where: { userId: user.id } });
+    if (!user.emailVerified) {
+      return res.status(409).json({
+        message: 'Account exists but email not verified',
+        emailVerified: false,
+        action: 'verify-email',
+      })
+    }
 
     // Create new session
     const session = await createSession(user.id)

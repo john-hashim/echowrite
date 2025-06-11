@@ -10,6 +10,7 @@ interface UseApiReturn<T, P extends any[]> {
   loading: boolean
   execute: (...args: P) => Promise<T>
   reset: () => void
+  errorData: any | null
 }
 
 /**
@@ -21,12 +22,14 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
+  const [errorData, setErrorData] = useState<any | null>(null)
 
   // Reset state function
   const reset = useCallback(() => {
     setData(null)
     setError(null)
     setLoading(false)
+    setErrorData(null)
   }, [])
 
   const execute = useCallback(
@@ -34,6 +37,7 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
       try {
         setLoading(true)
         // setError(null)
+        setErrorData(null)
         const response = await apiFunc(...args)
         setData(response.data)
         return response.data
@@ -48,6 +52,10 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
           'Something went wrong'
 
         setError(errorMessage)
+
+        if (axiosError.response?.data) {
+          setErrorData(axiosError.response.data)
+        }
 
         // Still need to throw the error for the component to catch it
         throw err
@@ -64,5 +72,6 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
     loading,
     execute,
     reset,
+    errorData,
   }
 }
