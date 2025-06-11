@@ -62,6 +62,17 @@ export const register = async (req: Request, res: Response): Promise<any> => {
     })
 
     if (existingUser) {
+      if (!existingUser.emailVerified) {
+        // // Optionally resend verification email
+        // const emailResult = await sendVerificationEmailService(existingUser.email)
+
+        return res.status(409).json({
+          message: 'Account exists but email not verified',
+          emailVerified: false,
+          // emailSent: emailResult.success,
+          action: 'verify-email', // This tells frontend what action to take
+        })
+      }
       return res.status(409).json({ message: 'User already exists' })
     }
 

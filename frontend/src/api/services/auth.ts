@@ -31,12 +31,21 @@ export interface verificationResponce {
 }
 export interface AuthResponse {
   user: UserResponse
+  message: string
+  emailSent?: boolean
+  emailVerified?: boolean
+  action?: 'verify-email' | 'login' // Tells frontend what to do next
   token: string
 }
 
 export interface verifyOtpParams {
   email: string
   otp: string
+}
+
+export interface EmailVerificationSendApiResponce {
+  success: boolean
+  message: string
 }
 
 export const authService = {
@@ -67,11 +76,13 @@ export const authService = {
   },
 
   /**
-   * Get current user profile
-   * @returns Promise with user data
+   * Send Email Verification OTP
+   * @returns Promise with email verification status and users email id
    */
-  getMe: (): Promise<AxiosResponse<UserResponse>> => {
-    return apiClient.get(ENDPOINTS.AUTH.GET_ME)
+  sendVerificationEmail: (
+    email: string
+  ): Promise<AxiosResponse<EmailVerificationSendApiResponce>> => {
+    return apiClient.post(ENDPOINTS.AUTH.SEND_VERIFICATION_EMAIL, { email })
   },
 
   /**
@@ -80,5 +91,13 @@ export const authService = {
    */
   verifyEmail: (data: verifyOtpParams): Promise<AxiosResponse<verificationResponce>> => {
     return apiClient.post(ENDPOINTS.AUTH.VERIFY_OTP, data)
+  },
+
+  /**
+   * Get current user profile
+   * @returns Promise with user data
+   */
+  getMe: (): Promise<AxiosResponse<UserResponse>> => {
+    return apiClient.get(ENDPOINTS.AUTH.GET_ME)
   },
 }

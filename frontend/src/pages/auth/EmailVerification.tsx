@@ -13,7 +13,12 @@ import { Input } from '@/components/ui/input'
 import { Loader2, CheckCircle2, Mail } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
-import { authService, verificationResponce, verifyOtpParams } from '@/api/services/auth'
+import {
+  authService,
+  EmailVerificationSendApiResponce,
+  verificationResponce,
+  verifyOtpParams,
+} from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
 
 const EmailVerification: React.FC = () => {
@@ -25,14 +30,13 @@ const EmailVerification: React.FC = () => {
   //   const [isVerifying, setIsVerifying] = useState(false)
   const [verificationError, setVerificationError] = useState('')
 
-  // Get the location state containing the email and credentials
+  // Get the location state containing the email
   const location = useLocation()
   const navigate = useNavigate()
   const { login } = useAuth()
 
   const state = location.state
   const userEmail = state?.email || ''
-  const userCredentials = state?.credentials
 
   // Create an array of refs using useRef
   const inputRefs = useRef<Array<HTMLInputElement | null>>([])
@@ -41,10 +45,20 @@ const EmailVerification: React.FC = () => {
     authService.verifyEmail
   )
 
+  const { execute: executeEmailVerification } = useApi<EmailVerificationSendApiResponce, [string]>(
+    authService.sendVerificationEmail
+  )
+
   // Initialize the refs array
   if (!inputRefs.current) {
     inputRefs.current = Array(6).fill(null)
   }
+
+  useEffect(() => {
+    if (!userEmail) {
+      navigate('/login')
+    }
+  }, [userEmail])
 
   // Handle countdown for resend button
   useEffect(() => {
@@ -118,7 +132,7 @@ const EmailVerification: React.FC = () => {
   }
 
   const handleVerify = async () => {
-    if (!isComplete || !userCredentials) return
+    if (!isComplete) return
 
     // setIsVerifying(true)
     setVerificationError('')
@@ -149,11 +163,7 @@ const EmailVerification: React.FC = () => {
     setVerificationError('')
 
     try {
-      // Call your resend OTP API here
-      // For example:
-      // await authService.resendVerificationCode({ email: userEmail })
-
-      // Set countdown for resend button
+      executeEmailVerification(userEmail)
       setResendCountdown(60)
     } catch (error) {
       console.error('Error resending code:', error)
