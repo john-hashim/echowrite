@@ -15,6 +15,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
+import { Spinner } from '@/components/ui/spinner'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -24,248 +25,93 @@ const Register: React.FC = () => {
     agreeTerms: false,
   })
 
-  const [errors, setErrors] = useState({
-    name: '',
-    email: '',
-    password: '',
-    agreeTerms: '',
-    server: '',
-  })
-
-  const [formSubmitted, setFormSubmitted] = useState(false)
+  const [clicked, setClicked] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-
-  const handleGoogleSignIn = () => {
-    console.log('Google sign-in clicked')
-  }
+  const [errorValue, setErrorValue] = useState('')
 
   const navigate = useNavigate()
 
-  const { execute: executeRegister, error: registerError } = useApi<AuthResponse, [RegisterData]>(
-    authService.register
-  )
+  const {
+    execute: executeRegister,
+    loading,
+    error: serverError,
+  } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
   useEffect(() => {
-    if (registerError) {
-      setErrors(prev => ({
-        ...prev,
-        server: registerError,
-      }))
+    if (serverError) {
+      setErrorValue(serverError)
     }
-  }, [registerError])
+  }, [serverError])
 
   const isValidEmail = (email: string): boolean => {
-    const emailRegex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    return emailRegex.test(email)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email.trim())
   }
 
-  // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     const newValue = type === 'checkbox' ? checked : value
 
-    // Update form data with new value
     setFormData(prev => ({
       ...prev,
       [name]: newValue,
     }))
-
-    // Check if the field is now empty and set appropriate error
-    if (name === 'name' && !value.trim()) {
-      setErrors(prev => ({
-        ...prev,
-        name: 'Name is required',
-      }))
-    } else if (name === 'email') {
-      if (!value.trim()) {
-        setErrors(prev => ({
-          ...prev,
-          email: 'Email is required',
-        }))
-      } else if (!isValidEmail(value)) {
-        setErrors(prev => ({
-          ...prev,
-          email: 'Please enter a valid email address',
-        }))
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          email: '',
-        }))
-      }
-    } else if (name === 'password') {
-      if (!value) {
-        setErrors(prev => ({
-          ...prev,
-          password: 'Password is required',
-        }))
-      } else if (value.length < 6) {
-        setErrors(prev => ({
-          ...prev,
-          password: 'Password must be at least 6 characters',
-        }))
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          password: '',
-        }))
-      }
-    } else if (name === 'agreeTerms') {
-      if (!checked) {
-        setErrors(prev => ({
-          ...prev,
-          agreeTerms: 'You must agree to the terms and conditions',
-        }))
-      } else {
-        setErrors(prev => ({
-          ...prev,
-          agreeTerms: '',
-        }))
-      }
-    } else {
-      // Clear error for this field if it's valid
-      setErrors(prev => ({
-        ...prev,
-        [name]: '',
-      }))
-    }
   }
 
-  // Handle field blur for validation
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const { name } = e.target
-    validateField(name)
-  }
-
-  // Validate a specific field
-  const validateField = (fieldName: string, value?: any) => {
-    let newErrors = { ...errors }
-
-    // Use the passed value if provided, otherwise use the value from formData
-    const data = {
-      ...formData,
-      [fieldName]: value !== undefined ? value : formData[fieldName as keyof typeof formData],
+  const getValidationError = () => {
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password) {
+      return 'Please fill in all fields'
     }
-
-    switch (fieldName) {
-      case 'name':
-        if (!data.name.trim()) {
-          newErrors.name = 'Name is required'
-        } else {
-          newErrors.name = ''
-        }
-        break
-      case 'email':
-        if (!data.email.trim()) {
-          newErrors.email = 'Email is required'
-        } else if (!isValidEmail(data.email)) {
-          newErrors.email = 'Please enter a valid email address'
-        } else {
-          newErrors.email = ''
-        }
-        break
-      case 'password':
-        if (!data.password) {
-          newErrors.password = 'Password is required'
-        } else if (data.password.length < 6) {
-          newErrors.password = 'Password must be at least 6 characters'
-        } else {
-          newErrors.password = ''
-        }
-        break
-      case 'agreeTerms':
-        if (!data.agreeTerms) {
-          newErrors.agreeTerms = 'You must agree to the terms and conditions'
-        } else {
-          newErrors.agreeTerms = ''
-        }
-        break
-      default:
-        break
+    if (!isValidEmail(formData.email)) {
+      return 'Please enter a valid email address'
     }
-
-    setErrors(newErrors)
-    return !newErrors[fieldName as keyof typeof newErrors]
-  }
-
-  // Validate all fields
-  const validateForm = () => {
-    // Create a new errors object to hold all validation errors
-    let newErrors = { ...errors }
-    let isValid = true
-
-    // Validate name
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-      isValid = false
-    } else {
-      newErrors.name = ''
+    if (formData.password.length < 6) {
+      return 'Password must be at least 6 characters'
     }
-
-    // Validate email
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-      isValid = false
-    } else if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-      isValid = false
-    } else {
-      newErrors.email = ''
-    }
-
-    // Validate password
-    if (!formData.password) {
-      newErrors.password = 'Password is required'
-      isValid = false
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters'
-      isValid = false
-    } else {
-      newErrors.password = ''
-    }
-
-    // Validate terms agreement
     if (!formData.agreeTerms) {
-      newErrors.agreeTerms = 'You must agree to the terms and conditions'
-      isValid = false
-    } else {
-      newErrors.agreeTerms = ''
+      return 'You must agree to the terms and conditions'
     }
-
-    // Update all errors at once
-    setErrors(newErrors)
-    return isValid
+    return null
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setFormSubmitted(true) // Mark the form as submitted to show errors
 
-    // Validate all fields and show all errors immediately
-    const isValid = validateForm()
-    if (!isValid) {
+    setClicked(true)
+    setTimeout(() => {
+      setClicked(false)
+    }, 200)
+
+    setErrorValue('')
+    const validationError = getValidationError()
+    if (validationError) {
+      setErrorValue(validationError)
       return
     }
 
     try {
       const credentials = {
-        name: formData.name,
-        email: formData.email,
+        name: formData.name.trim(),
+        email: formData.email.trim(),
         password: formData.password,
       }
       const response = await executeRegister(credentials)
-      if (!response) {
-        console.log('Register Error')
+
+      if (response) {
+        navigate('/verify-email', {
+          state: {
+            email: formData.email,
+          },
+        })
       }
-      navigate('/verify-email', {
-        state: {
-          email: formData.email,
-        },
-      })
     } catch (err) {
-      // Error is already handled by useApi hook
+      // Error is handled by useApi hook and will show in serverError
+      console.error('Registration failed:', err)
     }
+  }
+
+  const handleGoogleSignIn = () => {
+    console.log('Google sign-in clicked')
   }
 
   return (
@@ -285,14 +131,8 @@ const Register: React.FC = () => {
                 placeholder="John Doe"
                 value={formData.name}
                 onChange={handleChange}
-                onBlur={handleBlur}
-                className={formSubmitted && errors.name ? 'border-red-500' : ''}
+                disabled={loading || clicked}
               />
-              <div className="h-4">
-                {formSubmitted && errors.name && (
-                  <p className="text-red-500 text-xs">{errors.name}</p>
-                )}
-              </div>
             </div>
 
             <div className="space-y-1">
@@ -300,18 +140,12 @@ const Register: React.FC = () => {
               <Input
                 id="email"
                 name="email"
-                type="email"
+                type="text"
                 placeholder="m@example.com"
                 value={formData.email}
                 onChange={handleChange}
-                onBlur={handleBlur}
-                className={formSubmitted && errors.email ? 'border-red-500' : ''}
+                disabled={loading || clicked}
               />
-              <div className="h-4">
-                {formSubmitted && errors.email && (
-                  <p className="text-red-500 text-xs">{errors.email}</p>
-                )}
-              </div>
             </div>
 
             <div className="space-y-1">
@@ -323,8 +157,8 @@ const Register: React.FC = () => {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={formSubmitted && errors.password ? 'border-red-500 pr-10' : 'pr-10'}
+                  disabled={loading || clicked}
+                  className="pr-10"
                 />
                 <button
                   type="button"
@@ -364,59 +198,44 @@ const Register: React.FC = () => {
                   )}
                 </button>
               </div>
-              <div className="h-4">
-                {formSubmitted && errors.password && (
-                  <p className="text-red-500 text-xs">{errors.password}</p>
-                )}
-              </div>
             </div>
 
-            <div className="flex items-center mb-2">
-              <div className="flex h-5 items-center pt-0.5">
-                <Checkbox
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={formData.agreeTerms}
-                  onCheckedChange={checked => {
-                    setFormData(prev => ({ ...prev, agreeTerms: checked as boolean }))
-                    if (checked) {
-                      setErrors(prev => ({ ...prev, agreeTerms: '' }))
-                    } else if (formSubmitted) {
-                      setErrors(prev => ({
-                        ...prev,
-                        agreeTerms: 'You must agree to the terms and conditions',
-                      }))
-                    }
-                  }}
-                  className={formSubmitted && errors.agreeTerms ? 'border-red-500' : ''}
-                />
-              </div>
-              <div className="ml-2">
-                <Label
-                  htmlFor="agreeTerms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree to the{' '}
-                  <Link to="/terms" className="text-primary hover:underline">
-                    terms of service
-                  </Link>{' '}
-                  and{' '}
-                  <Link to="/privacy" className="text-primary hover:underline">
-                    privacy policy
-                  </Link>
-                </Label>
-              </div>
+            <div className="flex items-center space-x-2 mb-0">
+              <Checkbox
+                id="agreeTerms"
+                name="agreeTerms"
+                checked={formData.agreeTerms}
+                onCheckedChange={checked => {
+                  setFormData(prev => ({ ...prev, agreeTerms: checked as boolean }))
+                }}
+              />
+              <Label
+                htmlFor="agreeTerms"
+                className="text-sm font-medium leading-relaxed peer-disabled:cursor-not-allowed peer-disabled:opacity-70 block"
+              >
+                I agree to the{' '}
+                <Link to="/terms" className="text-primary hover:underline whitespace-nowrap">
+                  terms of service
+                </Link>{' '}
+                and{' '}
+                <Link to="/privacy" className="text-primary hover:underline whitespace-nowrap">
+                  privacy policy
+                </Link>
+              </Label>
             </div>
 
-            {errors.server && (
-              <Alert className="my-2">
-                <AlertTitle>Oops!</AlertTitle>
-                <AlertDescription>{errors.server}</AlertDescription>
-              </Alert>
-            )}
+            <div className="min-h-20 flex items-center">
+              {errorValue && (
+                <Alert>
+                  <AlertTitle>Oops!</AlertTitle>
+                  <AlertDescription>{errorValue}</AlertDescription>
+                </Alert>
+              )}
+            </div>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-3 pt-3">
-            <Button type="submit" className="w-full">
+          <CardFooter className="flex flex-col space-y-3 pt-1">
+            <Button type="submit" className="w-full" disabled={loading || clicked}>
+              {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
               Sign up
             </Button>
             <Button
