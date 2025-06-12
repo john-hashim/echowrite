@@ -27,15 +27,9 @@ const Login: React.FC = () => {
     rememberMe: false,
   })
 
-  const [errors, setErrors] = useState({
-    email: '',
-    password: '',
-    server: '',
-  })
-
   const [clicked, setClicked] = useState(false)
-  const [formSubmitted, setFormSubmitted] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [errorValue, setErrorValue] = useState('')
 
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -43,7 +37,7 @@ const Login: React.FC = () => {
   const {
     execute: executeLogin,
     loading,
-    error,
+    error: serverError,
     data,
   } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
 
@@ -59,107 +53,72 @@ const Login: React.FC = () => {
   }, [data, formData.email, navigate])
 
   useEffect(() => {
-    if (error) {
-      setFormData(prev => ({
-        ...prev,
-        password: '',
-      }))
-
-      setErrors(prev => ({
-        ...prev,
-        server: error,
-      }))
+    if (serverError) {
+      setErrorValue(serverError)
     }
-  }, [error])
+  }, [serverError, loading])
 
   const isValidEmail = (email: string): boolean => {
-    const emailRegex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    return emailRegex.test(email)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email.trim())
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target
     const newValue = type === 'checkbox' ? checked : value
 
-    // Update form data
     setFormData(prev => ({
       ...prev,
       [name]: newValue,
     }))
-
-    // Clear error as user types
-    setErrors(prev => ({
-      ...prev,
-      [name]: '',
-    }))
   }
 
-  const validateForm = () => {
-    let newErrors = { ...errors }
-    let isValid = true
-    let validationMessage = ''
-
-    // Validate email
+  const getValidationError = () => {
+    if (!formData.email.trim() && !formData.password) {
+      return 'Email and password are required'
+    }
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-      validationMessage = 'Email is required'
-      isValid = false
-    } else if (!isValidEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address'
-      validationMessage = 'Please enter a valid email address'
-      isValid = false
-    } else {
-      newErrors.email = ''
+      return 'Email is required'
     }
-
-    // Validate password
     if (!formData.password) {
-      newErrors.password = 'Password is required'
-      validationMessage = validationMessage
-        ? validationMessage + ' and password is required'
-        : 'Password is required'
-      isValid = false
-    } else {
-      newErrors.password = ''
+      return 'Password is required'
     }
-
-    // Set the server error to show validation message
-    if (!isValid) {
-      newErrors.server = validationMessage
+    if (!isValidEmail(formData.email)) {
+      return 'Please enter a valid email address'
     }
-
-    setErrors(newErrors)
-    return isValid
+    return null
   }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     setClicked(true)
-    setFormSubmitted(true)
-
-    // Clear previous server error
-    setErrors(prev => ({
-      ...prev,
-      server: '',
-    }))
-
     setTimeout(() => {
       setClicked(false)
     }, 200)
 
-    // Validate form
-    const isValid = validateForm()
-    if (!isValid) {
+    setErrorValue('')
+    const validationError = getValidationError()
+    if (validationError) {
+      setErrorValue(validationError)
       return
     }
 
     try {
-      const credentials = { email: formData.email, password: formData.password }
+      const credentials = {
+        email: formData.email.trim(),
+        password: formData.password,
+      }
       const response = await executeLogin(credentials)
-      login(response.token, formData.rememberMe)
-      navigate('/dashboard')
-    } catch (err) {}
+
+      if (response) {
+        login(response.token, formData.rememberMe)
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      // Error is handled by useApi hook and will show in serverError
+      console.error('Login failed:', err)
+    }
   }
 
   const handleGoogleSignIn = () => {
@@ -197,7 +156,7 @@ const Login: React.FC = () => {
                 <Input
                   id="email"
                   name="email"
-                  type="email"
+                  type="text"
                   placeholder="m@example.com"
                   value={formData.email}
                   onChange={handleChange}
@@ -304,16 +263,10 @@ const Login: React.FC = () => {
             </div>
 
             <div className="min-h-20 flex items-center">
-              {formSubmitted && errors.server && (
+              {errorValue && (
                 <Alert>
                   <AlertTitle>Oops!</AlertTitle>
-                  <AlertDescription>{errors.server}</AlertDescription>
-                </Alert>
-              )}
-              {error && !errors.server && (
-                <Alert>
-                  <AlertTitle>Oops!</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{errorValue}</AlertDescription>
                 </Alert>
               )}
             </div>
