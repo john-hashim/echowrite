@@ -10,41 +10,35 @@ interface UseApiReturn<T, P extends any[]> {
   loading: boolean
   execute: (...args: P) => Promise<T>
   reset: () => void
-  errorData: any | null
 }
 
-/**
- * Custom hook for making API calls
- * @param apiFunc - API function to call
- * @returns Object with data, error, loading state, execute function, and reset function
- */
 export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiReturn<T, P> {
   const [data, setData] = useState<T | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
-  const [errorData, setErrorData] = useState<any | null>(null)
 
-  // Reset state function
   const reset = useCallback(() => {
     setData(null)
     setError(null)
     setLoading(false)
-    setErrorData(null)
   }, [])
 
   const execute = useCallback(
     async (...args: P): Promise<T> => {
       try {
         setLoading(true)
-        // setError(null)
-        setErrorData(null)
         const response = await apiFunc(...args)
         setData(response.data)
         return response.data
       } catch (err) {
-        const axiosError = err as AxiosError<{ message?: string; error?: string }>
+        const axiosError = err as AxiosError<any>
 
-        // Extract error message from different possible response formats
+        // Set the error response data to data field so we can access it
+        if (axiosError.response?.data) {
+          setData(axiosError.response.data)
+        }
+
+        // Extract error message for the error field
         const errorMessage =
           axiosError.response?.data?.message ||
           axiosError.response?.data?.error ||
@@ -52,12 +46,6 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
           'Something went wrong'
 
         setError(errorMessage)
-
-        if (axiosError.response?.data) {
-          setErrorData(axiosError.response.data)
-        }
-
-        // Still need to throw the error for the component to catch it
         throw err
       } finally {
         setLoading(false)
@@ -72,6 +60,5 @@ export function useApi<T, P extends any[]>(apiFunc: ApiFunction<T, P>): UseApiRe
     loading,
     execute,
     reset,
-    errorData,
   }
 }

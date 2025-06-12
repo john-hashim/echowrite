@@ -16,12 +16,7 @@ import { useNavigate } from 'react-router-dom'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 import { useApi } from '@/hooks/useApi'
-import {
-  authService,
-  LoginCredentials,
-  AuthResponse,
-  EmailVerificationSendApiResponce,
-} from '@/api/services/auth'
+import { authService, LoginCredentials, AuthResponse } from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -49,13 +44,19 @@ const Login: React.FC = () => {
     execute: executeLogin,
     loading,
     error,
-    errorData,
+    data,
   } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
 
-  const { execute: executeEmailVerification, error: emailVerifyApiError } = useApi<
-    EmailVerificationSendApiResponce,
-    [string]
-  >(authService.sendVerificationEmail)
+  useEffect(() => {
+    if (data?.action === 'verify-email') {
+      navigate('/verify-email', {
+        state: {
+          email: formData.email,
+          fromLogin: true,
+        },
+      })
+    }
+  }, [data, formData.email, navigate])
 
   useEffect(() => {
     if (error) {
@@ -70,15 +71,6 @@ const Login: React.FC = () => {
       }))
     }
   }, [error])
-
-  useEffect(() => {
-    if (emailVerifyApiError) {
-      setErrors(prev => ({
-        ...prev,
-        server: emailVerifyApiError,
-      }))
-    }
-  }, [emailVerifyApiError])
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex =
@@ -167,22 +159,7 @@ const Login: React.FC = () => {
       const response = await executeLogin(credentials)
       login(response.token, formData.rememberMe)
       navigate('/dashboard')
-    } catch (err) {
-      // Error is handled by useApi hook
-    }
-  }
-
-  const handleVerification = (email: string) => {
-    navigate('/verify-email', {
-      state: {
-        email,
-      },
-    })
-    try {
-      executeEmailVerification(formData.email)
-    } catch (err) {
-      // Error is already handled by useApi hook
-    }
+    } catch (err) {}
   }
 
   const handleGoogleSignIn = () => {
@@ -331,14 +308,6 @@ const Login: React.FC = () => {
                 <Alert>
                   <AlertTitle>Oops!</AlertTitle>
                   <AlertDescription>{errors.server}</AlertDescription>
-                  {errorData?.message == 'Account exists but email not verified' && (
-                    <div
-                      className="cursor-pointer"
-                      onClick={() => handleVerification(formData.email)}
-                    >
-                      verify
-                    </div>
-                  )}
                 </Alert>
               )}
               {error && !errors.server && (

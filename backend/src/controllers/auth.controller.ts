@@ -64,9 +64,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
     if (existingUser) {
       if (!existingUser.emailVerified) {
         return res.status(409).json({
-          message: 'Account exists but email not verified',
-          emailVerified: false,
-          action: 'verify-email',
+          message: 'User already exists',
         })
       }
       return res.status(409).json({ message: 'User already exists' })
@@ -140,13 +138,17 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     }
 
     if (!user.emailVerified) {
+      // Automatically send verification email
+      const verificationResult = await sendVerificationEmailService(email.toLowerCase())
+
       return res.status(409).json({
-        message: 'Account exists but email not verified',
+        message: 'Account exists but email not verified. Verification email sent.',
         emailVerified: false,
         action: 'verify-email',
+        email: email.toLowerCase(),
+        verificationEmailSent: verificationResult.success,
       })
     }
-
     // Create new session
     const session = await createSession(user.id)
 
