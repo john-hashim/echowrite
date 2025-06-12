@@ -13,12 +13,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import {
-  AuthResponse,
-  authService,
-  RegisterData,
-  EmailVerificationSendApiResponce,
-} from '@/api/services/auth'
+import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
 
 const Register: React.FC = () => {
@@ -46,16 +41,9 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const {
-    execute: executeRegister,
-    error: registerError,
-    errorData,
-  } = useApi<AuthResponse, [RegisterData]>(authService.register)
-
-  const { execute: executeEmailVerification, error: emailVerifyApiError } = useApi<
-    EmailVerificationSendApiResponce,
-    [string]
-  >(authService.sendVerificationEmail)
+  const { execute: executeRegister, error: registerError } = useApi<AuthResponse, [RegisterData]>(
+    authService.register
+  )
 
   useEffect(() => {
     if (registerError) {
@@ -65,15 +53,6 @@ const Register: React.FC = () => {
       }))
     }
   }, [registerError])
-
-  useEffect(() => {
-    if (emailVerifyApiError) {
-      setErrors(prev => ({
-        ...prev,
-        server: emailVerifyApiError,
-      }))
-    }
-  }, [emailVerifyApiError])
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex =
@@ -279,24 +258,13 @@ const Register: React.FC = () => {
       if (!response) {
         console.log('Register Error')
       }
-      handleVerification(formData.email, false)
+      navigate('/verify-email', {
+        state: {
+          email: formData.email,
+        },
+      })
     } catch (err) {
       // Error is already handled by useApi hook
-    }
-  }
-
-  const handleVerification = (email: string, excuteApi: boolean) => {
-    navigate('/verify-email', {
-      state: {
-        email,
-      },
-    })
-    if (excuteApi) {
-      try {
-        executeEmailVerification(formData.email)
-      } catch (err) {
-        // Error is already handled by useApi hook
-      }
     }
   }
 
@@ -444,14 +412,6 @@ const Register: React.FC = () => {
               <Alert className="my-2">
                 <AlertTitle>Oops!</AlertTitle>
                 <AlertDescription>{errors.server}</AlertDescription>
-                {!errorData?.emailVerified && (
-                  <div
-                    className="cursor-pointer"
-                    onClick={() => handleVerification(formData.email, true)}
-                  >
-                    verify
-                  </div>
-                )}
               </Alert>
             )}
           </CardContent>
