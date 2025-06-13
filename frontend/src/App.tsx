@@ -62,6 +62,26 @@ function AppRoutes() {
           )
         }
       />
+      <Route
+        path="/forgot-password"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            routes.find(r => r.path === '/forgot-password')?.element
+          )
+        }
+      />
+      <Route
+        path="/reset-password"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            routes.find(r => r.path === '/reset-password')?.element
+          )
+        }
+      />
 
       {/* Protected routes that require authentication */}
       <Route

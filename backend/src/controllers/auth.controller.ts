@@ -3,7 +3,13 @@ import { Request, Response } from 'express'
 import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import { prisma } from '../prisma/client'
-import { sendVerificationEmailService, verifyOtpService } from '../services/email.service'
+import {
+  requestPasswordResetOtpService,
+  resetPasswordService,
+  sendVerificationEmailService,
+  verifyOtpService,
+  verifyPasswordResetOtpService,
+} from '../services/email.service'
 import { SendVerificationEmailRequest } from '../types/auth.types'
 
 interface LoginCredentials {
@@ -223,9 +229,6 @@ export const getMe = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-/**
- * Request password reset
- */
 export const requestPasswordReset = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email } = req.body
@@ -234,38 +237,14 @@ export const requestPasswordReset = async (req: Request, res: Response): Promise
       return res.status(400).json({ message: 'Email is required' })
     }
 
-    // Find user by email
-    const user = await prisma.user.findUnique({ where: { email } })
+    const result = await requestPasswordResetOtpService(email)
 
-    if (!user) {
-      // Don't reveal that the user doesn't exist for security
-      return res.status(200).json({
-        message: 'If an account with that email exists, a reset link has been sent',
-      })
+    if (!result.success) {
+      return res.status(500).json({ message: result.message })
     }
 
-    // Generate reset token
-    const resetToken = generateToken()
-
-    // Set token expiration (1 hour from now)
-    const resetTokenExpires = new Date()
-    resetTokenExpires.setHours(resetTokenExpires.getHours() + 1)
-
-    // Save token to database
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        resetToken,
-        resetTokenExpires,
-      },
-    })
-
-    // In a real app, you would send an email with the reset token
-    // For development, we'll just return it
     return res.status(200).json({
-      message: 'If an account with that email exists, a reset link has been sent',
-      // Include reset token in development only
-      dev: { resetToken },
+      message: result.message,
     })
   } catch (error) {
     console.error('Password reset request error:', error)
@@ -273,84 +252,72 @@ export const requestPasswordReset = async (req: Request, res: Response): Promise
   }
 }
 
-/**
- * Reset password using token
- */
 export const resetPassword = async (req: Request, res: Response): Promise<any> => {
   try {
-    const { resetToken, newPassword } = req.body
-
-    if (!resetToken || !newPassword) {
-      return res.status(400).json({ message: 'Reset token and new password are required' })
+    const { email, otp, newPassword } = req.body
+    const user = await prisma.user.findUnique({
+      where: { email },
+    })
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        message: 'Email, OTP, and new password are required',
+      })
     }
 
-    // Find user by reset token
-    const user = await prisma.user.findFirst({
-      where: {
-        resetToken,
-        resetTokenExpires: {
-          gt: new Date(), // Token must not be expired
-        },
-      },
-    })
-
-    if (!user) {
-      return res.status(400).json({ message: 'Invalid or expired reset token' })
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return res.status(400).json({
+        message: 'Please enter a valid email address',
+      })
     }
 
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10)
+    if (!/^\d{6}$/.test(otp)) {
+      return res.status(400).json({
+        message: 'OTP must be a 6-digit number',
+      })
+    }
 
-    // Update user password and clear reset token
-    await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-        resetToken: null,
-        resetTokenExpires: null,
-      },
-    })
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        message: 'Password must be at least 6 characters long',
+      })
+    }
 
-    // Clear any existing sessions for this user
-    await prisma.session.deleteMany({
-      where: { userId: user.id },
-    })
+    const verificationResult = await verifyPasswordResetOtpService(email.toLowerCase(), otp)
+
+    if (!verificationResult.success) {
+      return res.status(400).json({
+        message: verificationResult.message,
+      })
+    }
+
+    const resetResult = await resetPasswordService(email.toLowerCase(), otp, newPassword)
+
+    if (!resetResult.success) {
+      return res.status(400).json({
+        message: resetResult.message,
+      })
+    }
 
     return res.status(200).json({
-      message: 'Password reset successful. Please login with your new password.',
+      message: 'Password reset successfully',
+      success: true,
     })
   } catch (error) {
-    console.error('Password reset error:', error)
-    return res.status(500).json({ message: 'Error resetting password' })
+    res.status(500).json({
+      success: false,
+      message: 'Error in reset password, please try again later',
+    })
   }
 }
 
-/**
- * Send verification email (Simplified for registered users)
- */
 export const sendVerificationEmail = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email }: SendVerificationEmailRequest = req.body
 
-    // Validate input
     if (!email) {
       return res.status(400).json({ message: 'Email is required' })
     }
 
-    // Find existing user
-    const user = await prisma.user.findUnique({
-      where: { email: email.toLowerCase() },
-    })
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found. Please register first.' })
-    }
-
-    if (user.emailVerified) {
-      return res.status(400).json({ message: 'Email is already verified' })
-    }
-
-    // Send verification email
     const result = await sendVerificationEmailService(email.toLowerCase())
 
     if (!result.success) {

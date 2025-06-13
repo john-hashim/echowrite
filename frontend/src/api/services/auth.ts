@@ -20,7 +20,12 @@ export interface UserResponse {
   id: string
   email: string
   name?: string
-  // Add other user fields as needed
+}
+
+export interface ResetPasswordInterface {
+  email: string
+  newPassword: string
+  otp: string
 }
 
 export interface verificationResponce {
@@ -47,6 +52,11 @@ export interface EmailVerificationSendApiResponce {
   success: boolean
   message: string
   emailVerified?: boolean
+}
+
+export interface BasicResponce {
+  message: string
+  success: boolean
 }
 
 export const authService = {
@@ -94,6 +104,20 @@ export const authService = {
     return apiClient.post(ENDPOINTS.AUTH.VERIFY_OTP, data)
   },
 
+  /**
+   * Send Otp for reset password
+   * @returns Promise with success status
+   */
+  requestPasswordReset: (email: string): Promise<AxiosResponse<BasicResponce>> => {
+    return apiClient.post(ENDPOINTS.AUTH.REQUEST_PASSWORD_RESET, { email })
+  },
+  /**
+   * Send Otp for reset password
+   * @returns Promise with success status
+   */
+  resetPassword: (data: ResetPasswordInterface): Promise<AxiosResponse<BasicResponce>> => {
+    return apiClient.post(ENDPOINTS.AUTH.RESET_PASSWORD, data)
+  },
   /**
    * Get current user profile
    * @returns Promise with user data
