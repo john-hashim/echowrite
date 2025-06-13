@@ -67,7 +67,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
           message: 'User already exists',
         })
       }
-      return res.status(409).json({ message: 'User already exists' })
+      return res.status(409).json({ message: 'User already exists, Please signin' })
     }
 
     // Hash password
