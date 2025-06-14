@@ -80,3 +80,46 @@ export const getVerificationEmailTemplate = (otp: string): string => {
       </html>
     `
 }
+
+export const getForgotPasswordEmailTemplate = (otp: string): string => {
+  return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Reset Your Password</title>
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: #dc3545; color: white; padding: 20px; text-align: center; }
+          .content { padding: 20px; background: #f9f9f9; }
+          .otp-code { font-size: 24px; font-weight: bold; color: #dc3545; text-align: center; padding: 20px; background: white; border-radius: 8px; margin: 20px 0; }
+          .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+          .warning { background: #fff3cd; padding: 15px; border-radius: 5px; border-left: 4px solid #ffc107; margin: 20px 0; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Password Reset Request</h1>
+          </div>
+          <div class="content">
+            <h2>Reset Your Password</h2>
+            <p>We received a request to reset your password. Please use the following code to proceed with your password reset:</p>
+            <div class="otp-code">${otp}</div>
+            <p>Enter this code in the password reset form to create your new password.</p>
+            
+            <div class="warning">
+              <strong>⚠️ Security Notice:</strong><br>
+              This password reset code will expire in 10 minutes for security reasons. If you didn't request this password reset, please ignore this email or contact our support team.
+            </div>
+          </div>
+          <div class="footer">
+            <p>&copy; 2025 Your App Name. All rights reserved.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+}

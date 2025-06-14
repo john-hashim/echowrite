@@ -4,6 +4,7 @@ import {
   generateOTP,
   getOTPExpiration,
   getVerificationEmailTemplate,
+  getForgotPasswordEmailTemplate,
 } from '../utils/email.utils'
 import bcrypt from 'bcrypt'
 
@@ -165,7 +166,7 @@ export const requestPasswordResetOtpService = async (email: string) => {
     const emailSent = await sendEmail({
       to: email,
       subject: 'Password Reset - Your App Name',
-      html: getVerificationEmailTemplate(otp),
+      html: getForgotPasswordEmailTemplate(otp),
     })
 
     if (!emailSent) {
