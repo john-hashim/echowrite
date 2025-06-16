@@ -25,6 +25,11 @@ model User {
   updatedAt         DateTime  @updatedAt
   sessions          Session[]
 
+  // Google OAuth fields
+  googleId String? @unique
+  avatar   String?
+  provider String? @default("local")
+
   emailVerified   Boolean   @default(false)
   verificationOtp String?
   otpExpiresAt    DateTime?

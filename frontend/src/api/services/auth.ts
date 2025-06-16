@@ -20,6 +20,9 @@ export interface UserResponse {
   id: string
   email: string
   name?: string
+  avatar?: string
+  provider?: string
+  emailVerified?: boolean
 }
 
 export interface ResetPasswordInterface {
@@ -34,6 +37,7 @@ export interface verificationResponce {
   token: string
   verified: boolean
 }
+
 export interface AuthResponse {
   user: UserResponse
   message: string
@@ -41,6 +45,7 @@ export interface AuthResponse {
   emailVerified?: boolean
   action?: 'verify-email' | 'login' // Tells frontend what to do next
   token: string
+  isNewUser?: boolean // For Google sign-in
 }
 
 export interface verifyOtpParams {
@@ -57,6 +62,27 @@ export interface EmailVerificationSendApiResponce {
 export interface BasicResponce {
   message: string
   success: boolean
+}
+
+// Google Auth interfaces
+export interface GoogleAuthResponse {
+  success: boolean
+  authUrl: string
+  message: string
+}
+
+export interface GoogleSignInRequest {
+  code: string
+}
+
+export interface LinkGoogleAccountRequest {
+  code: string
+}
+
+export interface GoogleAccountResponse {
+  success: boolean
+  message: string
+  user: UserResponse
 }
 
 export const authService = {
@@ -111,18 +137,58 @@ export const authService = {
   requestPasswordReset: (email: string): Promise<AxiosResponse<BasicResponce>> => {
     return apiClient.post(ENDPOINTS.AUTH.REQUEST_PASSWORD_RESET, { email })
   },
+
   /**
-   * Send Otp for reset password
+   * Reset password with OTP
    * @returns Promise with success status
    */
   resetPassword: (data: ResetPasswordInterface): Promise<AxiosResponse<BasicResponce>> => {
     return apiClient.post(ENDPOINTS.AUTH.RESET_PASSWORD, data)
   },
+
   /**
    * Get current user profile
    * @returns Promise with user data
    */
   getMe: (): Promise<AxiosResponse<UserResponse>> => {
     return apiClient.get(ENDPOINTS.AUTH.GET_ME)
+  },
+
+  // Google Auth methods
+
+  /**
+   * Get Google OAuth URL for authentication
+   * @returns Promise with Google auth URL
+   */
+  googleAuth: (): Promise<AxiosResponse<GoogleAuthResponse>> => {
+    return apiClient.get(ENDPOINTS.AUTH.GOOGLE.AUTH)
+  },
+
+  /**
+   * Sign in with Google using authorization code (API approach)
+   * @param data - Google authorization code
+   * @returns Promise with user data and token
+   */
+  googleSignIn: (data: GoogleSignInRequest): Promise<AxiosResponse<AuthResponse>> => {
+    return apiClient.post(ENDPOINTS.AUTH.GOOGLE.SIGNIN, data)
+  },
+
+  /**
+   * Link Google account to existing user
+   * @param data - Google authorization code
+   * @returns Promise with updated user data
+   */
+  linkGoogleAccount: (
+    data: LinkGoogleAccountRequest
+  ): Promise<AxiosResponse<GoogleAccountResponse>> => {
+    return apiClient.post(ENDPOINTS.AUTH.GOOGLE.LINK, data)
+  },
+
+  /**
+   * Unlink Google account from user
+   * @returns Promise with updated user data
+   */
+  unlinkGoogleAccount: (): Promise<AxiosResponse<GoogleAccountResponse>> => {
+    return apiClient.delete(ENDPOINTS.AUTH.GOOGLE.UNLINK)
   },
 }

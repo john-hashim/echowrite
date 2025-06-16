@@ -1009,6 +1009,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    googleId: string | null
+    avatar: string | null
+    provider: string | null
     emailVerified: boolean | null
     verificationOtp: string | null
     otpExpiresAt: Date | null
@@ -1023,6 +1026,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    googleId: string | null
+    avatar: string | null
+    provider: string | null
     emailVerified: boolean | null
     verificationOtp: string | null
     otpExpiresAt: Date | null
@@ -1037,6 +1043,9 @@ export namespace Prisma {
     resetTokenExpires: number
     createdAt: number
     updatedAt: number
+    googleId: number
+    avatar: number
+    provider: number
     emailVerified: number
     verificationOtp: number
     otpExpiresAt: number
@@ -1053,6 +1062,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    googleId?: true
+    avatar?: true
+    provider?: true
     emailVerified?: true
     verificationOtp?: true
     otpExpiresAt?: true
@@ -1067,6 +1079,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    googleId?: true
+    avatar?: true
+    provider?: true
     emailVerified?: true
     verificationOtp?: true
     otpExpiresAt?: true
@@ -1081,6 +1096,9 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    googleId?: true
+    avatar?: true
+    provider?: true
     emailVerified?: true
     verificationOtp?: true
     otpExpiresAt?: true
@@ -1168,6 +1186,9 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date
     updatedAt: Date
+    googleId: string | null
+    avatar: string | null
+    provider: string | null
     emailVerified: boolean
     verificationOtp: string | null
     otpExpiresAt: Date | null
@@ -1199,6 +1220,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    googleId?: boolean
+    avatar?: boolean
+    provider?: boolean
     emailVerified?: boolean
     verificationOtp?: boolean
     otpExpiresAt?: boolean
@@ -1215,6 +1239,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    googleId?: boolean
+    avatar?: boolean
+    provider?: boolean
     emailVerified?: boolean
     verificationOtp?: boolean
     otpExpiresAt?: boolean
@@ -1229,6 +1256,9 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    googleId?: boolean
+    avatar?: boolean
+    provider?: boolean
     emailVerified?: boolean
     verificationOtp?: boolean
     otpExpiresAt?: boolean
@@ -1243,12 +1273,15 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    googleId?: boolean
+    avatar?: boolean
+    provider?: boolean
     emailVerified?: boolean
     verificationOtp?: boolean
     otpExpiresAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt" | "emailVerified" | "verificationOtp" | "otpExpiresAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt" | "googleId" | "avatar" | "provider" | "emailVerified" | "verificationOtp" | "otpExpiresAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1270,6 +1303,9 @@ export namespace Prisma {
       resetTokenExpires: Date | null
       createdAt: Date
       updatedAt: Date
+      googleId: string | null
+      avatar: string | null
+      provider: string | null
       emailVerified: boolean
       verificationOtp: string | null
       otpExpiresAt: Date | null
@@ -1705,6 +1741,9 @@ export namespace Prisma {
     readonly resetTokenExpires: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly googleId: FieldRef<"User", 'String'>
+    readonly avatar: FieldRef<"User", 'String'>
+    readonly provider: FieldRef<"User", 'String'>
     readonly emailVerified: FieldRef<"User", 'Boolean'>
     readonly verificationOtp: FieldRef<"User", 'String'>
     readonly otpExpiresAt: FieldRef<"User", 'DateTime'>
@@ -3232,6 +3271,9 @@ export namespace Prisma {
     resetTokenExpires: 'resetTokenExpires',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
+    googleId: 'googleId',
+    avatar: 'avatar',
+    provider: 'provider',
     emailVerified: 'emailVerified',
     verificationOtp: 'verificationOtp',
     otpExpiresAt: 'otpExpiresAt'
@@ -3345,6 +3387,9 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    googleId?: StringNullableFilter<"User"> | string | null
+    avatar?: StringNullableFilter<"User"> | string | null
+    provider?: StringNullableFilter<"User"> | string | null
     emailVerified?: BoolFilter<"User"> | boolean
     verificationOtp?: StringNullableFilter<"User"> | string | null
     otpExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
@@ -3360,6 +3405,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    googleId?: SortOrderInput | SortOrder
+    avatar?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
     emailVerified?: SortOrder
     verificationOtp?: SortOrderInput | SortOrder
     otpExpiresAt?: SortOrderInput | SortOrder
@@ -3369,6 +3417,7 @@ export namespace Prisma {
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+    googleId?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -3378,11 +3427,13 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    avatar?: StringNullableFilter<"User"> | string | null
+    provider?: StringNullableFilter<"User"> | string | null
     emailVerified?: BoolFilter<"User"> | boolean
     verificationOtp?: StringNullableFilter<"User"> | string | null
     otpExpiresAt?: DateTimeNullableFilter<"User"> | Date | string | null
     sessions?: SessionListRelationFilter
-  }, "id" | "email">
+  }, "id" | "email" | "googleId">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -3393,6 +3444,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    googleId?: SortOrderInput | SortOrder
+    avatar?: SortOrderInput | SortOrder
+    provider?: SortOrderInput | SortOrder
     emailVerified?: SortOrder
     verificationOtp?: SortOrderInput | SortOrder
     otpExpiresAt?: SortOrderInput | SortOrder
@@ -3413,6 +3467,9 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    googleId?: StringNullableWithAggregatesFilter<"User"> | string | null
+    avatar?: StringNullableWithAggregatesFilter<"User"> | string | null
+    provider?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailVerified?: BoolWithAggregatesFilter<"User"> | boolean
     verificationOtp?: StringNullableWithAggregatesFilter<"User"> | string | null
     otpExpiresAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -3487,6 +3544,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    googleId?: string | null
+    avatar?: string | null
+    provider?: string | null
     emailVerified?: boolean
     verificationOtp?: string | null
     otpExpiresAt?: Date | string | null
@@ -3502,6 +3562,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    googleId?: string | null
+    avatar?: string | null
+    provider?: string | null
     emailVerified?: boolean
     verificationOtp?: string | null
     otpExpiresAt?: Date | string | null
@@ -3517,6 +3580,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3532,6 +3598,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3547,6 +3616,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    googleId?: string | null
+    avatar?: string | null
+    provider?: string | null
     emailVerified?: boolean
     verificationOtp?: string | null
     otpExpiresAt?: Date | string | null
@@ -3561,6 +3633,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3575,6 +3650,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -3723,6 +3801,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    googleId?: SortOrder
+    avatar?: SortOrder
+    provider?: SortOrder
     emailVerified?: SortOrder
     verificationOtp?: SortOrder
     otpExpiresAt?: SortOrder
@@ -3737,6 +3818,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    googleId?: SortOrder
+    avatar?: SortOrder
+    provider?: SortOrder
     emailVerified?: SortOrder
     verificationOtp?: SortOrder
     otpExpiresAt?: SortOrder
@@ -3751,6 +3835,9 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    googleId?: SortOrder
+    avatar?: SortOrder
+    provider?: SortOrder
     emailVerified?: SortOrder
     verificationOtp?: SortOrder
     otpExpiresAt?: SortOrder
@@ -4146,6 +4233,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    googleId?: string | null
+    avatar?: string | null
+    provider?: string | null
     emailVerified?: boolean
     verificationOtp?: string | null
     otpExpiresAt?: Date | string | null
@@ -4160,6 +4250,9 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    googleId?: string | null
+    avatar?: string | null
+    provider?: string | null
     emailVerified?: boolean
     verificationOtp?: string | null
     otpExpiresAt?: Date | string | null
@@ -4190,6 +4283,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -4204,6 +4300,9 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    googleId?: NullableStringFieldUpdateOperationsInput | string | null
+    avatar?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: BoolFieldUpdateOperationsInput | boolean
     verificationOtp?: NullableStringFieldUpdateOperationsInput | string | null
     otpExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
