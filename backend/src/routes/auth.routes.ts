@@ -8,7 +8,7 @@ const router = express.Router()
 
 // routes/auth.routes.ts
 router.get('/google', googleAuthController.googleAuth) // Get Google auth URL
-router.get('/googley', googleAuthController.googleCallback) // Handle redirect
+router.get('/google/callback', googleAuthController.googleCallback)
 router.post('/google/signin', googleAuthController.googleSignInAPI) // API-based signin
 router.post(
   '/google/link',

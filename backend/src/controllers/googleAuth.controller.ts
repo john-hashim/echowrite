@@ -95,8 +95,8 @@ export const googleCallback = async (req: Request, res: Response): Promise<any> 
 
     // Redirect to frontend with success
     const redirectUrl = isNew
-      ? `${process.env.FRONTEND_URL || 'http://localhost:3000'}/welcome?google_auth=success`
-      : `${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard?google_auth=success`
+      ? `${process.env.FRONTEND_URL || 'http://localhost:5173'}/welcome?google_auth=success`
+      : `${process.env.FRONTEND_URL || 'http://localhost:5173'}/dashboard?google_auth=success`
 
     return res.redirect(redirectUrl)
   } catch (error) {
