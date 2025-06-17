@@ -155,17 +155,10 @@ const Login: React.FC = () => {
       if (response && response.token) {
         // Always remember Google logins for better UX
         login(response.token, true)
-
-        // Check if it's a new user and handle navigation
-        if (response.isNewUser) {
-          navigate('/onboarding', { state: { user: response.user } })
-        } else {
-          navigate('/dashboard')
-        }
+        navigate('/dashboard')
       }
     } catch (err) {
       console.error('Google login failed:', err)
-      // Error will be shown via googleError state
     }
   }
 

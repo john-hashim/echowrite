@@ -1,6 +1,7 @@
 import React, { FormEvent, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 import {
   Card,
   CardContent,
@@ -13,9 +14,10 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AuthResponse, authService, RegisterData } from '@/api/services/auth'
+import { AuthResponse, authService, GoogleSignInRequest, RegisterData } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
 import { Spinner } from '@/components/ui/spinner'
+import { useAuth } from '@/contexts/AuthContext'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -31,17 +33,31 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate()
 
+  const { login } = useAuth()
+
   const {
     execute: executeRegister,
     loading,
     error: serverError,
   } = useApi<AuthResponse, [RegisterData]>(authService.register)
 
+  const {
+    execute: executeGoogleSignIn,
+    loading: googleLoading,
+    error: googleError,
+  } = useApi<AuthResponse, [GoogleSignInRequest]>(authService.googleSignIn)
+
   useEffect(() => {
     if (serverError) {
       setErrorValue(serverError)
     }
   }, [serverError])
+
+  useEffect(() => {
+    if (googleError) {
+      setErrorValue(googleError)
+    }
+  }, [googleError])
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -110,8 +126,30 @@ const Register: React.FC = () => {
     }
   }
 
-  const handleGoogleSignIn = () => {
-    console.log('Google sign-in clicked')
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      setErrorValue('Failed to get Google credentials')
+      return
+    }
+
+    try {
+      setErrorValue('')
+      const response = await executeGoogleSignIn({
+        code: credentialResponse.credential,
+      })
+
+      if (response && response.token) {
+        // Always remember Google logins for better UX
+        login(response.token, true)
+        navigate('/dashboard')
+      }
+    } catch (err) {
+      console.error('Google login failed:', err)
+    }
+  }
+
+  const handleGoogleError = () => {
+    setErrorValue('Google sign-in failed. Please try again.')
   }
 
   return (
@@ -238,39 +276,24 @@ const Register: React.FC = () => {
               {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
               Sign up
             </Button>
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={handleGoogleSignIn}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                width="24"
-                height="24"
-                className="w-5 h-5"
-              >
-                <path
-                  fill="#4285F4"
-                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            <div className="w-full">
+              {googleLoading ? (
+                <Button variant="outline" className="w-full" disabled>
+                  <Spinner className="mr-2" />
+                  Connecting...
+                </Button>
+              ) : (
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="outline"
+                  size="large"
+                  width={384} // Set explicit width for full width
+                  useOneTap
+                  auto_select={false}
                 />
-                <path
-                  fill="#34A853"
-                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                />
-                <path
-                  fill="#FBBC05"
-                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                />
-                <path
-                  fill="#EA4335"
-                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                />
-                <path fill="none" d="M1 1h22v22H1z" />
-              </svg>
-              Sign up with Google
-            </Button>
+              )}
+            </div>
             <div className="text-center text-sm pt-1">
               Already have an account?{' '}
               <Link to="/login" className="font-medium text-primary hover:underline">
