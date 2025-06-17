@@ -146,7 +146,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/johnhashim/sass-starter/backend/src/generated/prisma",
+      "value": "/Users/johnhashim/echowrite/backend/src/generated/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -160,7 +160,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "/Users/johnhashim/sass-starter/backend/prisma/schema.prisma",
+    "sourceFilePath": "/Users/johnhashim/echowrite/backend/prisma/schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
@@ -174,12 +174,11 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": null
+        "value": "postgresql://postgres:6108@localhost:5433/echowrite"
       }
     }
   },
