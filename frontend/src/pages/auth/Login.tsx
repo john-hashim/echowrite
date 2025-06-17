@@ -67,7 +67,7 @@ const Login: React.FC = () => {
     if (serverError) {
       setErrorValue(serverError)
     }
-  }, [serverError])
+  }, [serverError, loading])
 
   useEffect(() => {
     if (googleError) {

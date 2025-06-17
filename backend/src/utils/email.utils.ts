@@ -12,7 +12,7 @@ interface EmailOptions {
 export const sendEmail = async ({ to, subject, html }: EmailOptions): Promise<Boolean> => {
   try {
     await transporter.sendMail({
-      from: process.env.FROM_EMAIL || 'noreply@style-talk.com',
+      from: process.env.FROM_EMAIL || 'noreply@youremail.com',
       to,
       subject,
       html,

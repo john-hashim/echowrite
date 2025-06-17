@@ -410,7 +410,6 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
       return
     }
 
-    // Extract user information from Google
     const googleData = {
       googleId: payload.sub,
       email: payload.email,
@@ -437,8 +436,7 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
           name: googleData.name,
           avatar: googleData.avatar,
           provider: 'google',
-          emailVerified: true, // Email is verified by Google
-          // Set a random password for Google users (they won't use it)
+          emailVerified: true,
           password: '', // Assuming this returns a hashed password
         },
       })
@@ -457,8 +455,7 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
       })
     }
 
-    // Create session/JWT token
-    const token = generateToken()
+    const session = await createSession(user.id)
 
     // Return the response
     res.status(200).json({
@@ -471,7 +468,7 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
         provider: user.provider,
         emailVerified: user.emailVerified,
       },
-      token: token,
+      token: session.token,
       isNewUser: isNewUser,
     })
   } catch (error) {
