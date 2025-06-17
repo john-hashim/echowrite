@@ -11,6 +11,9 @@ import {
   verifyPasswordResetOtpService,
 } from '../services/email.service'
 import { SendVerificationEmailRequest } from '../types/auth.types'
+import { OAuth2Client } from 'google-auth-library'
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 interface LoginCredentials {
   email: string
@@ -384,4 +387,95 @@ export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
     token: session.token,
     verified: true,
   })
+}
+
+export const googleSignIn = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { code: idToken } = req.body // Renamed for clarity, as it's an ID token
+
+    if (!idToken) {
+      res.status(400).json({ message: 'Google ID token is required' })
+      return
+    }
+
+    // Verify the Google ID token
+    const ticket = await client.verifyIdToken({
+      idToken: idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    })
+
+    const payload = ticket.getPayload()
+    if (!payload || !payload.sub || !payload.email) {
+      res.status(400).json({ message: 'Invalid Google token' })
+      return
+    }
+
+    // Extract user information from Google
+    const googleData = {
+      googleId: payload.sub,
+      email: payload.email,
+      name: payload.name || '',
+      avatar: payload.picture || '',
+      emailVerified: payload.email_verified || false,
+    }
+
+    // Find an existing user by Google ID or email
+    let user = await prisma.user.findFirst({
+      where: {
+        OR: [{ googleId: googleData.googleId }, { email: googleData.email }],
+      },
+    })
+
+    let isNewUser = false
+
+    if (!user) {
+      // Create a new user if one doesn't exist
+      user = await prisma.user.create({
+        data: {
+          googleId: googleData.googleId,
+          email: googleData.email,
+          name: googleData.name,
+          avatar: googleData.avatar,
+          provider: 'google',
+          emailVerified: true, // Email is verified by Google
+          // Set a random password for Google users (they won't use it)
+          password: '', // Assuming this returns a hashed password
+        },
+      })
+      isNewUser = true
+    } else if (!user.googleId) {
+      // If user exists with email but not linked to Google, link the account
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: {
+          googleId: googleData.googleId,
+          provider: 'google',
+          emailVerified: true, // Mark email as verified
+          // Update avatar if it's not already set
+          ...(!user.avatar && { avatar: googleData.avatar }),
+        },
+      })
+    }
+
+    // Create session/JWT token
+    const token = generateToken()
+
+    // Return the response
+    res.status(200).json({
+      message: isNewUser ? 'Account created successfully' : 'Login successful',
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+        provider: user.provider,
+        emailVerified: user.emailVerified,
+      },
+      token: token,
+      isNewUser: isNewUser,
+    })
+  } catch (error) {
+    console.error('Google sign-in error:', error)
+    res.status(500).json({ message: 'Error processing Google sign-in' })
+  }
 }

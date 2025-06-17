@@ -1,5 +1,6 @@
 import { useState, FormEvent, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -12,11 +13,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { useNavigate } from 'react-router-dom'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 import { useApi } from '@/hooks/useApi'
-import { authService, LoginCredentials, AuthResponse } from '@/api/services/auth'
+import {
+  authService,
+  LoginCredentials,
+  AuthResponse,
+  GoogleSignInRequest,
+} from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 
@@ -30,7 +35,6 @@ const Login: React.FC = () => {
   const [clicked, setClicked] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [errorValue, setErrorValue] = useState('')
-  const [googleLoading, setGoogleLoading] = useState(false)
 
   const navigate = useNavigate()
   const { login } = useAuth()
@@ -43,34 +47,10 @@ const Login: React.FC = () => {
   } = useApi<AuthResponse, [LoginCredentials]>(authService.login)
 
   const {
-    execute: executeGoogleAuth,
-    loading: googleAuthLoading,
-    error: googleAuthError,
-  } = useApi<{ success: boolean; authUrl: string; message: string }, []>(authService.googleAuth)
-
-  // Check for Google auth callback on component mount
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search)
-    const googleAuthStatus = urlParams.get('google_auth')
-    const error = urlParams.get('error')
-
-    if (googleAuthStatus === 'success') {
-      // User successfully authenticated with Google
-      // The backend should have set the auth cookie, so redirect to dashboard
-      navigate('/dashboard')
-    } else if (error) {
-      // Handle Google auth errors
-      const errorMessages: { [key: string]: string } = {
-        missing_code: 'Google authentication failed. Please try again.',
-        invalid_token: 'Invalid Google authentication. Please try again.',
-        auth_failed: 'Authentication failed. Please try again.',
-      }
-      setErrorValue(errorMessages[error] || 'Authentication failed. Please try again.')
-
-      // Clean up URL
-      window.history.replaceState({}, document.title, window.location.pathname)
-    }
-  }, [navigate])
+    execute: executeGoogleSignIn,
+    loading: googleLoading,
+    error: googleError,
+  } = useApi<AuthResponse, [GoogleSignInRequest]>(authService.googleSignIn)
 
   useEffect(() => {
     if (data?.action === 'verify-email') {
@@ -87,13 +67,13 @@ const Login: React.FC = () => {
     if (serverError) {
       setErrorValue(serverError)
     }
-  }, [serverError, loading])
+  }, [serverError])
 
   useEffect(() => {
-    if (googleAuthError) {
-      setErrorValue(googleAuthError)
+    if (googleError) {
+      setErrorValue(googleError)
     }
-  }, [googleAuthError])
+  }, [googleError])
 
   const isValidEmail = (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -148,7 +128,7 @@ const Login: React.FC = () => {
       }
       const response = await executeLogin(credentials)
 
-      if (response) {
+      if (response && response.token) {
         login(response.token, formData.rememberMe)
         navigate('/dashboard')
       }
@@ -158,28 +138,42 @@ const Login: React.FC = () => {
     }
   }
 
-  const handleGoogleSignIn = async () => {
-    setErrorValue('')
-    setGoogleLoading(true)
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
+    if (!credentialResponse.credential) {
+      setErrorValue('Failed to get Google credentials')
+      return
+    }
 
     try {
-      const response = await executeGoogleAuth()
+      setErrorValue('')
 
-      if (response?.success && response.authUrl) {
-        // Redirect to Google OAuth
-        window.location.href = response.authUrl
-      } else {
-        setErrorValue('Failed to initiate Google sign-in. Please try again.')
+      // Send the Google credential token to your backend
+      const response = await executeGoogleSignIn({
+        code: credentialResponse.credential,
+      })
+
+      if (response && response.token) {
+        // Always remember Google logins for better UX
+        login(response.token, true)
+
+        // Check if it's a new user and handle navigation
+        if (response.isNewUser) {
+          navigate('/onboarding', { state: { user: response.user } })
+        } else {
+          navigate('/dashboard')
+        }
       }
-    } catch (error) {
-      console.error('Google sign-in error:', error)
-      setErrorValue('Error connecting to Google. Please try again.')
-    } finally {
-      setGoogleLoading(false)
+    } catch (err) {
+      console.error('Google login failed:', err)
+      // Error will be shown via googleError state
     }
   }
 
-  const isFormDisabled = loading || clicked || googleLoading || googleAuthLoading
+  const handleGoogleError = () => {
+    setErrorValue('Google sign-in failed. Please try again.')
+  }
+
+  const isFormDisabled = loading || clicked || googleLoading
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-8">
@@ -344,44 +338,25 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full flex items-center justify-center gap-2"
-              onClick={handleGoogleSignIn}
-              disabled={isFormDisabled}
-            >
-              {googleLoading || googleAuthLoading ? (
-                <Spinner className="mr-2" />
+            {/* Google Login Button */}
+            <div className="w-full">
+              {googleLoading ? (
+                <Button variant="outline" className="w-full" disabled>
+                  <Spinner className="mr-2" />
+                  Connecting...
+                </Button>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  width="24"
-                  height="24"
-                  className="w-5 h-5"
-                >
-                  <path
-                    fill="#4285F4"
-                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  />
-                  <path
-                    fill="#34A853"
-                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  />
-                  <path
-                    fill="#FBBC05"
-                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  />
-                  <path
-                    fill="#EA4335"
-                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  />
-                  <path fill="none" d="M1 1h22v22H1z" />
-                </svg>
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  theme="outline"
+                  size="large"
+                  width={384} // Set explicit width for full width
+                  useOneTap
+                  auto_select={false}
+                />
               )}
-              {googleLoading || googleAuthLoading ? 'Connecting...' : 'Sign in with Google'}
-            </Button>
+            </div>
 
             <div className="text-center text-sm pt-1">
               Don't have an account?{' '}

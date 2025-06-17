@@ -3,22 +3,26 @@ import { ThemeToggle } from '@/components/common/theme-toggle'
 import routes from './routes'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 function App() {
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+  if (!googleClientId) {
+    console.error('Google Client ID is not set in environment variables')
+  }
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-      <AuthProvider>
-        {' '}
-        {/* Wrap the entire app with AuthProvider */}
-        <BrowserRouter>
-          {/* Theme toggle positioned in top right corner */}
-          <div className="fixed top-4 right-4 z-50">
-            <ThemeToggle />
-          </div>
-
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
+      <GoogleOAuthProvider clientId={googleClientId || ''}>
+        <AuthProvider>
+          {' '}
+          <BrowserRouter>
+            <div className="fixed top-4 right-4 z-50">
+              <ThemeToggle />
+            </div>
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+      </GoogleOAuthProvider>
     </ThemeProvider>
   )
 }
