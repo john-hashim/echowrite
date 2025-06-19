@@ -1009,6 +1009,7 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    toneText: string | null
     googleId: string | null
     avatar: string | null
     provider: string | null
@@ -1026,6 +1027,7 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date | null
     updatedAt: Date | null
+    toneText: string | null
     googleId: string | null
     avatar: string | null
     provider: string | null
@@ -1043,6 +1045,7 @@ export namespace Prisma {
     resetTokenExpires: number
     createdAt: number
     updatedAt: number
+    toneText: number
     googleId: number
     avatar: number
     provider: number
@@ -1062,6 +1065,7 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    toneText?: true
     googleId?: true
     avatar?: true
     provider?: true
@@ -1079,6 +1083,7 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    toneText?: true
     googleId?: true
     avatar?: true
     provider?: true
@@ -1096,6 +1101,7 @@ export namespace Prisma {
     resetTokenExpires?: true
     createdAt?: true
     updatedAt?: true
+    toneText?: true
     googleId?: true
     avatar?: true
     provider?: true
@@ -1186,6 +1192,7 @@ export namespace Prisma {
     resetTokenExpires: Date | null
     createdAt: Date
     updatedAt: Date
+    toneText: string | null
     googleId: string | null
     avatar: string | null
     provider: string | null
@@ -1220,6 +1227,7 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    toneText?: boolean
     googleId?: boolean
     avatar?: boolean
     provider?: boolean
@@ -1239,6 +1247,7 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    toneText?: boolean
     googleId?: boolean
     avatar?: boolean
     provider?: boolean
@@ -1256,6 +1265,7 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    toneText?: boolean
     googleId?: boolean
     avatar?: boolean
     provider?: boolean
@@ -1273,6 +1283,7 @@ export namespace Prisma {
     resetTokenExpires?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    toneText?: boolean
     googleId?: boolean
     avatar?: boolean
     provider?: boolean
@@ -1281,7 +1292,7 @@ export namespace Prisma {
     otpExpiresAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt" | "googleId" | "avatar" | "provider" | "emailVerified" | "verificationOtp" | "otpExpiresAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "password" | "resetToken" | "resetTokenExpires" | "createdAt" | "updatedAt" | "toneText" | "googleId" | "avatar" | "provider" | "emailVerified" | "verificationOtp" | "otpExpiresAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1303,6 +1314,7 @@ export namespace Prisma {
       resetTokenExpires: Date | null
       createdAt: Date
       updatedAt: Date
+      toneText: string | null
       googleId: string | null
       avatar: string | null
       provider: string | null
@@ -1741,6 +1753,7 @@ export namespace Prisma {
     readonly resetTokenExpires: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly toneText: FieldRef<"User", 'String'>
     readonly googleId: FieldRef<"User", 'String'>
     readonly avatar: FieldRef<"User", 'String'>
     readonly provider: FieldRef<"User", 'String'>
@@ -3271,6 +3284,7 @@ export namespace Prisma {
     resetTokenExpires: 'resetTokenExpires',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
+    toneText: 'toneText',
     googleId: 'googleId',
     avatar: 'avatar',
     provider: 'provider',
@@ -3387,6 +3401,7 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    toneText?: StringNullableFilter<"User"> | string | null
     googleId?: StringNullableFilter<"User"> | string | null
     avatar?: StringNullableFilter<"User"> | string | null
     provider?: StringNullableFilter<"User"> | string | null
@@ -3405,6 +3420,7 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    toneText?: SortOrderInput | SortOrder
     googleId?: SortOrderInput | SortOrder
     avatar?: SortOrderInput | SortOrder
     provider?: SortOrderInput | SortOrder
@@ -3427,6 +3443,7 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    toneText?: StringNullableFilter<"User"> | string | null
     avatar?: StringNullableFilter<"User"> | string | null
     provider?: StringNullableFilter<"User"> | string | null
     emailVerified?: BoolFilter<"User"> | boolean
@@ -3444,6 +3461,7 @@ export namespace Prisma {
     resetTokenExpires?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    toneText?: SortOrderInput | SortOrder
     googleId?: SortOrderInput | SortOrder
     avatar?: SortOrderInput | SortOrder
     provider?: SortOrderInput | SortOrder
@@ -3467,6 +3485,7 @@ export namespace Prisma {
     resetTokenExpires?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    toneText?: StringNullableWithAggregatesFilter<"User"> | string | null
     googleId?: StringNullableWithAggregatesFilter<"User"> | string | null
     avatar?: StringNullableWithAggregatesFilter<"User"> | string | null
     provider?: StringNullableWithAggregatesFilter<"User"> | string | null
@@ -3544,6 +3563,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    toneText?: string | null
     googleId?: string | null
     avatar?: string | null
     provider?: string | null
@@ -3562,6 +3582,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    toneText?: string | null
     googleId?: string | null
     avatar?: string | null
     provider?: string | null
@@ -3580,6 +3601,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3598,6 +3620,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3616,6 +3639,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    toneText?: string | null
     googleId?: string | null
     avatar?: string | null
     provider?: string | null
@@ -3633,6 +3657,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3650,6 +3675,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null
@@ -3801,6 +3827,7 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    toneText?: SortOrder
     googleId?: SortOrder
     avatar?: SortOrder
     provider?: SortOrder
@@ -3818,6 +3845,7 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    toneText?: SortOrder
     googleId?: SortOrder
     avatar?: SortOrder
     provider?: SortOrder
@@ -3835,6 +3863,7 @@ export namespace Prisma {
     resetTokenExpires?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    toneText?: SortOrder
     googleId?: SortOrder
     avatar?: SortOrder
     provider?: SortOrder
@@ -4233,6 +4262,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    toneText?: string | null
     googleId?: string | null
     avatar?: string | null
     provider?: string | null
@@ -4250,6 +4280,7 @@ export namespace Prisma {
     resetTokenExpires?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    toneText?: string | null
     googleId?: string | null
     avatar?: string | null
     provider?: string | null
@@ -4283,6 +4314,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null
@@ -4300,6 +4332,7 @@ export namespace Prisma {
     resetTokenExpires?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    toneText?: NullableStringFieldUpdateOperationsInput | string | null
     googleId?: NullableStringFieldUpdateOperationsInput | string | null
     avatar?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: NullableStringFieldUpdateOperationsInput | string | null

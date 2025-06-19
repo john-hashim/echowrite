@@ -25,6 +25,8 @@ model User {
   updatedAt         DateTime  @updatedAt
   sessions          Session[]
 
+  toneText String?
+
   // Google OAuth fields
   googleId String? @unique
   avatar   String?
