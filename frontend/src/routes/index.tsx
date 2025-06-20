@@ -1,9 +1,9 @@
 import { RouteObject } from 'react-router-dom'
 import { Login, Register } from '@/pages'
-import Dashboard from '@/pages/dashboard/Dashboard'
 import EmailVerification from '@/pages/auth/EmailVerification'
 import ForgotPassword from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
+import ChatComponent from '@/pages/chat/Chat'
 
 const routes: RouteObject[] = [
   {
@@ -19,10 +19,6 @@ const routes: RouteObject[] = [
     element: <Register />,
   },
   {
-    path: '/dashboard',
-    element: <Dashboard />,
-  },
-  {
     path: '/verify-email',
     element: <EmailVerification />,
   },
@@ -33,6 +29,10 @@ const routes: RouteObject[] = [
   {
     path: '/reset-password',
     element: <ResetPassword />,
+  },
+  {
+    path: '/chat',
+    element: <ChatComponent />,
   },
 ]
 

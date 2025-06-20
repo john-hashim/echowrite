@@ -129,8 +129,11 @@ const Login: React.FC = () => {
       const response = await executeLogin(credentials)
 
       if (response && response.token) {
-        login(response.token, formData.rememberMe)
-        navigate('/dashboard')
+        // Pass user data to login function for Zustand store
+        login(response.token, formData.rememberMe, response.user)
+
+        // Simply navigate to chat
+        navigate('/chat')
       }
     } catch (err) {
       // Error is handled by useApi hook and will show in serverError
@@ -153,9 +156,11 @@ const Login: React.FC = () => {
       })
 
       if (response && response.token) {
-        // Always remember Google logins for better UX
-        login(response.token, true)
-        navigate('/dashboard')
+        // Always remember Google logins for better UX and pass user data
+        login(response.token, true, response.user)
+
+        // Simply navigate to chat
+        navigate('/chat')
       }
     } catch (err) {
       console.error('Google login failed:', err)

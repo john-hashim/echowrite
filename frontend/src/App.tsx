@@ -4,6 +4,7 @@ import routes from './routes'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { useAuth } from './contexts/AuthContext'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -13,15 +14,14 @@ function App() {
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <GoogleOAuthProvider clientId={googleClientId || ''}>
-        <AuthProvider>
-          {' '}
-          <BrowserRouter>
+        <BrowserRouter>
+          <AuthProvider>
             <div className="fixed top-4 right-4 z-50">
               <ThemeToggle />
             </div>
             <AppRoutes />
-          </BrowserRouter>
-        </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
       </GoogleOAuthProvider>
     </ThemeProvider>
   )
@@ -29,7 +29,7 @@ function App() {
 
 // Separate component for routes that uses the auth context
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAuth() // Use the auth hook
+  const { isAuthenticated, isLoading } = useAuth()
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -41,7 +41,7 @@ function AppRoutes() {
       <Route
         path="/"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+          isAuthenticated ? <Navigate to="/chat" replace /> : <Navigate to="/login" replace />
         }
       />
 
@@ -50,7 +50,7 @@ function AppRoutes() {
         path="/login"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/chat" replace />
           ) : (
             routes.find(r => r.path === '/login')?.element
           )
@@ -60,7 +60,7 @@ function AppRoutes() {
         path="/register"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/chat" replace />
           ) : (
             routes.find(r => r.path === '/register')?.element
           )
@@ -70,7 +70,7 @@ function AppRoutes() {
         path="/forgot-password"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/chat" replace />
           ) : (
             routes.find(r => r.path === '/forgot-password')?.element
           )
@@ -80,21 +80,9 @@ function AppRoutes() {
         path="/reset-password"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/chat" replace />
           ) : (
             routes.find(r => r.path === '/reset-password')?.element
-          )
-        }
-      />
-
-      {/* Protected routes that require authentication */}
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated ? (
-            routes.find(r => r.path === '/dashboard')?.element
-          ) : (
-            <Navigate to="/login" replace />
           )
         }
       />
@@ -102,20 +90,28 @@ function AppRoutes() {
         path="/verify-email"
         element={
           isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
+            <Navigate to="/chat" replace />
           ) : (
             routes.find(r => r.path === '/verify-email')?.element
           )
         }
       />
-      {/* Add other protected routes in a similar way */}
+
+      {/* Protected routes */}
+      <Route
+        path="/chat"
+        element={
+          isAuthenticated ? (
+            routes.find(r => r.path === '/chat')?.element
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
-
-// Don't forget to import useAuth
-import { useAuth } from './contexts/AuthContext'
 
 export default App

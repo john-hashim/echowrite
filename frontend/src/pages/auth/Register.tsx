@@ -32,7 +32,6 @@ const Register: React.FC = () => {
   const [errorValue, setErrorValue] = useState('')
 
   const navigate = useNavigate()
-
   const { login } = useAuth()
 
   const {
@@ -139,9 +138,11 @@ const Register: React.FC = () => {
       })
 
       if (response && response.token) {
-        // Always remember Google logins for better UX
-        login(response.token, true)
-        navigate('/dashboard')
+        // Always remember Google logins for better UX and pass user data to Zustand
+        login(response.token, true, response.user)
+
+        // Simply navigate to chat
+        navigate('/chat')
       }
     } catch (err) {
       console.error('Google login failed:', err)

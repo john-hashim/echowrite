@@ -23,6 +23,14 @@ export interface UserResponse {
   avatar?: string
   provider?: string
   emailVerified?: boolean
+  toneText?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+// Response interface for the /auth/me endpoint
+export interface GetMeResponse {
+  user: UserResponse
 }
 
 export interface ResetPasswordInterface {
@@ -150,7 +158,7 @@ export const authService = {
    * Get current user profile
    * @returns Promise with user data
    */
-  getMe: (): Promise<AxiosResponse<UserResponse>> => {
+  getMe: (): Promise<AxiosResponse<GetMeResponse>> => {
     return apiClient.get(ENDPOINTS.AUTH.GET_ME)
   },
 

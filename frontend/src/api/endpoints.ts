@@ -19,6 +19,9 @@ export const ENDPOINTS = {
       UNLINK: '/auth/google/unlink', // DELETE - Unlink Google account
     },
   },
+  USER: {
+    UPDATE_TONE: '/user/tone',
+  },
 } as const
 
 export type EndpointValues = typeof ENDPOINTS

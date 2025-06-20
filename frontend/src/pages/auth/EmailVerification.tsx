@@ -144,8 +144,11 @@ const EmailVerification: React.FC = () => {
       if (!response) {
         console.log('verification problem')
       }
-      login(response.token, false)
-      navigate('/dashboard')
+      // Pass user data to login function for Zustand store
+      login(response.token, false, response.user)
+
+      // Simply navigate to chat
+      navigate('/chat')
     } catch (error) {
       setVerificationError('Invalid verification code. Please try again.')
       // Reset OTP fields for retry
