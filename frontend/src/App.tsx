@@ -1,10 +1,16 @@
 import { ThemeProvider } from '@/contexts/theme-provider'
 import { ThemeToggle } from '@/components/common/theme-toggle'
-import routes from './routes'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { useAuth } from './contexts/AuthContext'
+import { Login, Register } from '@/pages'
+import ForgotPassword from '@/pages/auth/ForgotPassword'
+import ResetPassword from '@/pages/auth/ResetPassword'
+import EmailVerification from '@/pages/auth/EmailVerification'
+import SetupTone from '@/pages/onboarding/SetupTone'
+import ChatComponent from '@/pages/chat/Chat'
+import { useUser } from '@/store'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -30,6 +36,7 @@ function App() {
 // Separate component for routes that uses the auth context
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth()
+  const user = useUser()
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -48,61 +55,39 @@ function AppRoutes() {
       {/* Public routes accessible to everyone */}
       <Route
         path="/login"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/chat" replace />
-          ) : (
-            routes.find(r => r.path === '/login')?.element
-          )
-        }
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <Login />}
       />
       <Route
         path="/register"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/chat" replace />
-          ) : (
-            routes.find(r => r.path === '/register')?.element
-          )
-        }
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <Register />}
       />
       <Route
         path="/forgot-password"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/chat" replace />
-          ) : (
-            routes.find(r => r.path === '/forgot-password')?.element
-          )
-        }
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <ForgotPassword />}
       />
       <Route
         path="/reset-password"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/chat" replace />
-          ) : (
-            routes.find(r => r.path === '/reset-password')?.element
-          )
-        }
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <ResetPassword />}
       />
       <Route
         path="/verify-email"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/chat" replace />
-          ) : (
-            routes.find(r => r.path === '/verify-email')?.element
-          )
-        }
+        element={isAuthenticated ? <Navigate to="/chat" replace /> : <EmailVerification />}
       />
 
       {/* Protected routes */}
       <Route
+        path="/setup-tone"
+        element={isAuthenticated ? <SetupTone /> : <Navigate to="/login" replace />}
+      />
+      <Route
         path="/chat"
         element={
           isAuthenticated ? (
-            routes.find(r => r.path === '/chat')?.element
+            user && !user.toneText ? (
+              <Navigate to="/setup-tone" replace />
+            ) : (
+              <ChatComponent />
+            )
           ) : (
             <Navigate to="/login" replace />
           )

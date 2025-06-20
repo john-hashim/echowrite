@@ -4,6 +4,7 @@ import EmailVerification from '@/pages/auth/EmailVerification'
 import ForgotPassword from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
 import ChatComponent from '@/pages/chat/Chat'
+import SetupTone from '@/pages/onboarding/SetupTone'
 
 const routes: RouteObject[] = [
   {
@@ -33,6 +34,10 @@ const routes: RouteObject[] = [
   {
     path: '/chat',
     element: <ChatComponent />,
+  },
+  {
+    path: '/setup-tone',
+    element: <SetupTone />,
   },
 ]
 

@@ -93,6 +93,16 @@ export interface GoogleAccountResponse {
   user: UserResponse
 }
 
+export interface UpdateToneRequest {
+  tone: string
+}
+
+export interface UpdateToneResponse {
+  success: boolean
+  user: UserResponse
+  message: string
+}
+
 export const authService = {
   /**
    * Login user with email and password
@@ -199,4 +209,12 @@ export const authService = {
   unlinkGoogleAccount: (): Promise<AxiosResponse<GoogleAccountResponse>> => {
     return apiClient.delete(ENDPOINTS.AUTH.GOOGLE.UNLINK)
   },
+
+  /**
+   * Update user's tone text
+   * @param data - Tone text data
+   * @returns Promise with updated user data
+   */
+  updateTone: (data: UpdateToneRequest): Promise<AxiosResponse<UpdateToneResponse>> =>
+    apiClient.post('/user/tone', data),
 }
