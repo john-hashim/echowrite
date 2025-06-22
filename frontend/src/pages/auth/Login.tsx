@@ -24,8 +24,11 @@ import {
 } from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
+import { useUserStore } from '@/store/userStore'
 
 const Login: React.FC = () => {
+  const { setUser } = useUserStore()
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -127,7 +130,7 @@ const Login: React.FC = () => {
         password: formData.password,
       }
       const response = await executeLogin(credentials)
-
+      setUser(response.user)
       if (response && response.token) {
         login(response.token, formData.rememberMe)
         navigate('/dashboard')
