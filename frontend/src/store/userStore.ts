@@ -38,21 +38,11 @@ export const useUserStore = create<State & Actions>()(
       user: null,
       isLoading: false,
 
-      // Actions with better devtools integration
       setUser: (user: UserResponse) =>
-        set(
-          state => userReducer(state, { type: 'setUser', payload: user }),
-          false, // Don't replace state, merge it
-          'setUser' // Action name
-        ),
-      clearUser: () =>
-        set(state => userReducer(state, { type: 'clearUser', payload: null }), false, 'clearUser'),
+        set(state => userReducer(state, { type: 'setUser', payload: user })),
+      clearUser: () => set(state => userReducer(state, { type: 'clearUser', payload: null })),
       setLoading: (isLoading: boolean) =>
-        set(
-          state => userReducer(state, { type: 'setLoading', payload: isLoading }),
-          false,
-          'setLoading'
-        ),
+        set(state => userReducer(state, { type: 'setLoading', payload: isLoading })),
     }),
     {
       name: 'user-store',
