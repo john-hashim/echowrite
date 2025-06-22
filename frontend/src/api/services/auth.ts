@@ -23,6 +23,7 @@ export interface UserResponse {
   avatar?: string
   provider?: string
   emailVerified?: boolean
+  toneText: string | null
 }
 
 export interface ResetPasswordInterface {

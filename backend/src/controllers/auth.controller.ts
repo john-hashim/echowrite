@@ -110,6 +110,9 @@ export const register = async (req: Request, res: Response): Promise<any> => {
         email: user.email,
         name: user.name,
         emailVerified: user.emailVerified,
+        toneText: user.toneText || null,
+        avatar: user.avatar || '',
+        provider: user.provider || 'email',
       },
       emailSent: emailResult.success,
     })
@@ -168,6 +171,10 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         id: user.id,
         email: user.email,
         name: user.name,
+        toneText: user.toneText,
+        emailVerified: user.emailVerified,
+        avatar: user.avatar,
+        provider: user.provider,
       },
       token: session.token,
     })
@@ -360,12 +367,6 @@ export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
   // OTP verified successfully - now create session and return token
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      emailVerified: true,
-    },
   })
 
   if (!user) {
@@ -383,6 +384,9 @@ export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
       email: user.email,
       name: user.name,
       emailVerified: user.emailVerified,
+      toneText: user.toneText || '',
+      avatar: user.avatar || '',
+      provider: user.provider || 'email',
     },
     token: session.token,
     verified: true,
