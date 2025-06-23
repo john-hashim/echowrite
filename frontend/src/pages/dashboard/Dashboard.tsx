@@ -4,10 +4,12 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
+import { useUserStore } from '@/store/userStore'
 
 const Dashboard: React.FC = () => {
   const { logout } = useAuth()
   const navigate = useNavigate()
+  const { logout: zustandLogout } = useUserStore()
 
   const { execute: executeLogout } = useApi<{ success: boolean }, []>(authService.logout)
 
@@ -15,9 +17,11 @@ const Dashboard: React.FC = () => {
     try {
       await executeLogout()
       logout()
+      zustandLogout()
       navigate('/login')
     } catch (error) {
       logout()
+      zustandLogout()
       navigate('/login')
     }
   }

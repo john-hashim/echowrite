@@ -1,6 +1,6 @@
 import { UserResponse } from '@/api/services/auth'
 import { create } from 'zustand'
-import { devtools } from 'zustand/middleware'
+import { devtools, persist } from 'zustand/middleware'
 
 type State = {
   user: UserResponse | null
@@ -11,39 +11,26 @@ type Actions = {
   setUser: (user: UserResponse) => void
   clearUser: () => void
   setLoading: (isLoading: boolean) => void
-}
-
-type Action = {
-  type: 'setUser' | 'clearUser' | 'setLoading'
-  payload: UserResponse | null | boolean
-}
-
-const userReducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case 'setUser':
-      return { ...state, user: action.payload as UserResponse }
-    case 'clearUser':
-      return { ...state, user: null }
-    case 'setLoading':
-      return { ...state, isLoading: action.payload as boolean }
-    default:
-      return state
-  }
+  logout: () => void
 }
 
 export const useUserStore = create<State & Actions>()(
   devtools(
-    set => ({
-      // Initial state
-      user: null,
-      isLoading: false,
+    persist(
+      set => ({
+        user: null,
+        isLoading: false,
 
-      setUser: (user: UserResponse) =>
-        set(state => userReducer(state, { type: 'setUser', payload: user })),
-      clearUser: () => set(state => userReducer(state, { type: 'clearUser', payload: null })),
-      setLoading: (isLoading: boolean) =>
-        set(state => userReducer(state, { type: 'setLoading', payload: isLoading })),
-    }),
+        setUser: (user: UserResponse) => set({ user }, false, 'setUser'),
+        clearUser: () => set({ user: null }, false, 'clearUser'),
+        setLoading: (isLoading: boolean) => set({ isLoading }, false, 'setLoading'),
+        logout: () => set({ user: null }, false, 'logout'),
+      }),
+      {
+        name: 'user-storage',
+        partialize: state => ({ user: state.user }),
+      }
+    ),
     {
       name: 'user-store',
       serialize: {
