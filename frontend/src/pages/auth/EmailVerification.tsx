@@ -20,6 +20,7 @@ import {
   verifyOtpParams,
 } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
+import { useUserStore } from '@/store/userStore'
 
 const EmailVerification: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
@@ -34,6 +35,7 @@ const EmailVerification: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { login } = useAuth()
+  const { setUser } = useUserStore()
 
   const state = location.state
   const userEmail = state?.email || ''
@@ -144,6 +146,7 @@ const EmailVerification: React.FC = () => {
       if (!response) {
         console.log('verification problem')
       }
+      setUser(response.user)
       login(response.token, false)
       navigate('/dashboard')
     } catch (error) {

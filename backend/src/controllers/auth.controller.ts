@@ -471,6 +471,7 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
         avatar: user.avatar,
         provider: user.provider,
         emailVerified: user.emailVerified,
+        toneText: user.toneText,
       },
       token: session.token,
       isNewUser: isNewUser,

@@ -130,8 +130,8 @@ const Login: React.FC = () => {
         password: formData.password,
       }
       const response = await executeLogin(credentials)
-      setUser(response.user)
       if (response && response.token) {
+        setUser(response.user)
         login(response.token, formData.rememberMe)
         navigate('/dashboard')
       }
@@ -156,7 +156,7 @@ const Login: React.FC = () => {
       })
 
       if (response && response.token) {
-        // Always remember Google logins for better UX
+        setUser(response.user)
         login(response.token, true)
         navigate('/dashboard')
       }

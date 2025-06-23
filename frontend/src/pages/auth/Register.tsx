@@ -18,6 +18,7 @@ import { AuthResponse, authService, GoogleSignInRequest, RegisterData } from '@/
 import { useApi } from '@/hooks/useApi'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
+import { useUserStore } from '@/store/userStore'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +34,7 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate()
 
+  const { setUser } = useUserStore()
   const { login } = useAuth()
 
   const {
@@ -139,7 +141,7 @@ const Register: React.FC = () => {
       })
 
       if (response && response.token) {
-        // Always remember Google logins for better UX
+        setUser(response.user)
         login(response.token, true)
         navigate('/dashboard')
       }
