@@ -99,6 +99,26 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/setup-tone"
+        element={
+          isAuthenticated ? (
+            routes.find(r => r.path === '/setup-tone')?.element
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
+        path="/chat"
+        element={
+          isAuthenticated ? (
+            routes.find(r => r.path === '/chat')?.element
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
+      <Route
         path="/verify-email"
         element={
           isAuthenticated ? (

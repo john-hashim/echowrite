@@ -4,6 +4,8 @@ import Dashboard from '@/pages/dashboard/Dashboard'
 import EmailVerification from '@/pages/auth/EmailVerification'
 import ForgotPassword from '@/pages/auth/ForgotPassword'
 import ResetPassword from '@/pages/auth/ResetPassword'
+import SetupTone from '@/pages/feature/SetupTone'
+import Chat from '@/pages/feature/Chat'
 
 const routes: RouteObject[] = [
   {
@@ -33,6 +35,14 @@ const routes: RouteObject[] = [
   {
     path: '/reset-password',
     element: <ResetPassword />,
+  },
+  {
+    path: '/setup-tone',
+    element: <SetupTone />,
+  },
+  {
+    path: '/chat',
+    element: <Chat />,
   },
 ]
 
