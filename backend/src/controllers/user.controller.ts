@@ -19,7 +19,18 @@ export const updateUserToneHandler = async (req: Request, res: Response): Promis
       data: { toneText: tone },
     })
 
-    return res.json({ message: 'Tone updated successfully', user: updatedUser })
+    return res.json({
+      message: 'Tone updated successfully',
+      user: {
+        id: updatedUser.id,
+        email: updatedUser.email,
+        name: updatedUser.name,
+        toneText: updatedUser.toneText,
+        emailVerified: updatedUser.emailVerified,
+        avatar: updatedUser.avatar,
+        provider: updatedUser.provider,
+      },
+    })
   } catch (error) {
     console.error('Error updating tone:', error)
     return res.status(500).json({ message: 'Internal server error' })
