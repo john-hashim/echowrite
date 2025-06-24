@@ -1,11 +1,15 @@
 import { RouteObject } from 'react-router-dom'
-import { Login, Register } from '@/pages'
-import Dashboard from '@/pages/dashboard/Dashboard'
-import EmailVerification from '@/pages/auth/EmailVerification'
-import ForgotPassword from '@/pages/auth/ForgotPassword'
-import ResetPassword from '@/pages/auth/ResetPassword'
-import SetupTone from '@/pages/feature/SetupTone'
-import Chat from '@/pages/feature/Chat'
+import { lazy } from 'react'
+
+// Lazy load components
+const Login = lazy(() => import('@/pages/auth/Login'))
+const Register = lazy(() => import('@/pages/auth/Register'))
+const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'))
+const EmailVerification = lazy(() => import('@/pages/auth/EmailVerification'))
+const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'))
+const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'))
+const SetupTone = lazy(() => import('@/pages/feature/SetupTone'))
+const Chat = lazy(() => import('@/pages/feature/Chat'))
 
 const routes: RouteObject[] = [
   {

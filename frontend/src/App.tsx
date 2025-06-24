@@ -4,6 +4,7 @@ import routes from './routes'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { Suspense } from 'react'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -19,7 +20,13 @@ function App() {
             <div className="fixed top-4 right-4 z-50">
               <ThemeToggle />
             </div>
-            <AppRoutes />
+            <Suspense
+              fallback={
+                <div className="flex min-h-screen items-center justify-center">Loading...</div>
+              }
+            >
+              <AppRoutes />
+            </Suspense>
           </BrowserRouter>
         </AuthProvider>
       </GoogleOAuthProvider>
