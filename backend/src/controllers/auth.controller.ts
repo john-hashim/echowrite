@@ -26,16 +26,10 @@ interface RegisterData {
   name?: string
 }
 
-/**
- * Generate secure random token
- */
 const generateToken = (): string => {
   return crypto.randomBytes(32).toString('hex')
 }
 
-/**
- * Create a new session for a user
- */
 const createSession = async (userId: string) => {
   // Set expiration to 7 days from now
   const expiresAt = new Date()
@@ -53,19 +47,14 @@ const createSession = async (userId: string) => {
   return session
 }
 
-/**
- * Register a new user
- */
 export const register = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password, name }: RegisterData = req.body
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' })
     }
 
-    // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
@@ -79,10 +68,8 @@ export const register = async (req: Request, res: Response): Promise<any> => {
       return res.status(409).json({ message: 'User already exists, Please signin' })
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Create new user
     const user = await prisma.user.create({
       data: {
         email,
@@ -92,17 +79,12 @@ export const register = async (req: Request, res: Response): Promise<any> => {
       },
     })
 
-    // Send verification email
     const emailResult = await sendVerificationEmailService(user.email)
 
     if (!emailResult.success) {
-      // If email fails, we could either:
-      // 1. Delete the user and return error
-      // 2. Keep user and let them resend later (recommended)
       console.warn('Failed to send verification email to:', user.email)
     }
 
-    // Return user data and token
     return res.status(201).json({
       message: 'Registration successful! Please check your email for verification.',
       user: {
@@ -122,19 +104,14 @@ export const register = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-/**
- * Login user
- */
 export const login = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password }: LoginCredentials = req.body
 
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' })
     }
 
-    // Find user
     const user = await prisma.user.findUnique({
       where: { email },
     })
@@ -143,14 +120,12 @@ export const login = async (req: Request, res: Response): Promise<any> => {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
-    // Verify password
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
       return res.status(401).json({ message: 'Invalid credentials' })
     }
 
     if (!user.emailVerified) {
-      // Automatically send verification email
       const verificationResult = await sendVerificationEmailService(email.toLowerCase())
 
       return res.status(409).json({
@@ -161,10 +136,8 @@ export const login = async (req: Request, res: Response): Promise<any> => {
         verificationEmailSent: verificationResult.success,
       })
     }
-    // Create new session
     const session = await createSession(user.id)
 
-    // Return user data and token
     return res.status(200).json({
       message: 'Login successful',
       user: {
@@ -184,18 +157,13 @@ export const login = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-/**
- * Logout user
- */
 export const logout = async (req: Request, res: Response): Promise<any> => {
   try {
-    // Get session from request (set by authenticateToken middleware)
     const session = req.session
     if (!session) {
       return res.status(400).json({ success: true })
     }
 
-    // Delete the session
     await prisma.session.delete({
       where: { id: session.id },
     })
@@ -207,12 +175,8 @@ export const logout = async (req: Request, res: Response): Promise<any> => {
   }
 }
 
-/**
- * Get current user profile
- */
 export const getMe = async (req: Request, res: Response): Promise<any> => {
   try {
-    // req.user is set by the authenticateToken middleware
     if (!req.user) {
       return res.status(401).json({ message: 'Not authenticated' })
     }
@@ -265,7 +229,7 @@ export const requestPasswordReset = async (req: Request, res: Response): Promise
 export const resetPassword = async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, otp, newPassword } = req.body
-    const user = await prisma.user.findUnique({
+    await prisma.user.findUnique({
       where: { email },
     })
     if (!email || !otp || !newPassword) {
@@ -347,24 +311,20 @@ export const sendVerificationEmail = async (req: Request, res: Response): Promis
 export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
   const { email, otp } = req.body
 
-  // Validate input
   if (!email || !otp) {
     return res.status(400).json({ message: 'Email and OTP are required' })
   }
 
-  // Validate OTP format (6 digits)
   if (!/^\d{6}$/.test(otp)) {
     return res.status(400).json({ message: 'OTP must be 6 digits' })
   }
 
-  // Verify OTP
   const result = await verifyOtpService(email.toLowerCase(), otp)
 
   if (!result.success) {
     return res.status(400).json({ message: result.message })
   }
 
-  // OTP verified successfully - now create session and return token
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase() },
   })
@@ -373,10 +333,8 @@ export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
     return res.status(404).json({ message: 'User not found' })
   }
 
-  // Create session for the verified user
   const session = await createSession(user.id)
 
-  // Return success with token - user is now fully registered and logged in
   return res.status(200).json({
     message: 'Email verified successfully! You are now logged in.',
     user: {
@@ -395,14 +353,13 @@ export const verifyOtp = async (req: Request, res: Response): Promise<any> => {
 
 export const googleSignIn = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { code: idToken } = req.body // Renamed for clarity, as it's an ID token
+    const { code: idToken } = req.body
 
     if (!idToken) {
       res.status(400).json({ message: 'Google ID token is required' })
       return
     }
 
-    // Verify the Google ID token
     const ticket = await client.verifyIdToken({
       idToken: idToken,
       audience: process.env.GOOGLE_CLIENT_ID,
@@ -422,7 +379,6 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
       emailVerified: payload.email_verified || false,
     }
 
-    // Find an existing user by Google ID or email
     let user = await prisma.user.findFirst({
       where: {
         OR: [{ googleId: googleData.googleId }, { email: googleData.email }],
@@ -432,7 +388,6 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
     let isNewUser = false
 
     if (!user) {
-      // Create a new user if one doesn't exist
       user = await prisma.user.create({
         data: {
           googleId: googleData.googleId,
@@ -441,19 +396,17 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
           avatar: googleData.avatar,
           provider: 'google',
           emailVerified: true,
-          password: '', // Assuming this returns a hashed password
+          password: '',
         },
       })
       isNewUser = true
     } else if (!user.googleId) {
-      // If user exists with email but not linked to Google, link the account
       user = await prisma.user.update({
         where: { id: user.id },
         data: {
           googleId: googleData.googleId,
           provider: 'google',
-          emailVerified: true, // Mark email as verified
-          // Update avatar if it's not already set
+          emailVerified: true,
           ...(!user.avatar && { avatar: googleData.avatar }),
         },
       })
@@ -461,7 +414,6 @@ export const googleSignIn = async (req: Request, res: Response): Promise<void> =
 
     const session = await createSession(user.id)
 
-    // Return the response
     res.status(200).json({
       message: isNewUser ? 'Account created successfully' : 'Login successful',
       user: {

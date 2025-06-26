@@ -5,7 +5,7 @@ import * as authMiddleware from '../middleware/auth.middleware'
 
 const router = express.Router()
 
-router.post('/google/signin', authController.googleSignIn) // API-based signin
+router.post('/google/signin', authController.googleSignIn)
 
 // Public routes
 router.post('/register', authController.register)

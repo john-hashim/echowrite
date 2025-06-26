@@ -2,7 +2,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { prisma } from '../prisma/client'
 
-// Extend Express Request type
 declare global {
   namespace Express {
     interface Request {
@@ -12,9 +11,6 @@ declare global {
   }
 }
 
-/**
- * Middleware to authenticate user based on session token
- */
 export const authenticateToken = async (
   req: Request,
   res: Response,
@@ -28,22 +24,18 @@ export const authenticateToken = async (
       return res.status(401).json({ message: 'Authentication required' })
     }
 
-    // Find the session
     const session = await prisma.session.findUnique({
       where: { token },
       include: { user: true },
     })
 
-    // Check if session exists and is not expired
     if (!session || new Date() > session.expiresAt) {
       if (session) {
-        // Clean up expired session
         await prisma.session.delete({ where: { id: session.id } })
       }
       return res.status(401).json({ message: 'Session expired or invalid' })
     }
 
-    // Set user and session in request
     req.user = {
       id: session.user.id,
       email: session.user.email,
@@ -58,9 +50,6 @@ export const authenticateToken = async (
   }
 }
 
-/**
- * Middleware to check if user exists
- */
 export const userExists = async (req: Request, res: Response, next: NextFunction): Promise<any> => {
   try {
     const userId = req.user?.id
@@ -77,7 +66,6 @@ export const userExists = async (req: Request, res: Response, next: NextFunction
       return res.status(404).json({ message: 'User not found' })
     }
 
-    // Refresh user data
     req.user = {
       id: user.id,
       email: user.email,
@@ -100,7 +88,7 @@ export const requireEmailVerification = async (
     if (!req.user) {
       return res.status(401).json({ message: 'Authentication required' })
     }
-    // Get fresh user data to check verification status
+
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: { emailVerified: true, email: true },
