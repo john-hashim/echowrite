@@ -35,6 +35,7 @@ model User {
   emailVerified   Boolean   @default(false)
   verificationOtp String?
   otpExpiresAt    DateTime?
+  Thread          Thread[]
 
   @@map("users")
 }
@@ -50,4 +51,34 @@ model Session {
 
   @@index([userId])
   @@map("sessions")
+}
+
+model Thread {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   Message[]
+
+  @@index([userId])
+  @@map("threads")
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  threadId  String
+  content   String   @db.Text
+  role      Role
+  createdAt DateTime @default(now())
+  thread    Thread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@map("messages")
+}
+
+enum Role {
+  user
+  assistant
 }

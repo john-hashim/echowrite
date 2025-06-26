@@ -144,6 +144,22 @@ exports.Prisma.SessionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ThreadScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MessageScalarFieldEnum = {
+  id: 'id',
+  threadId: 'threadId',
+  content: 'content',
+  role: 'role',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -158,11 +174,16 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.Role = exports.$Enums.Role = {
+  user: 'user',
+  assistant: 'assistant'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Session: 'Session'
+  Session: 'Session',
+  Thread: 'Thread',
+  Message: 'Message'
 };
 
 /**
