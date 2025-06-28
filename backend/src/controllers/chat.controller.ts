@@ -1,11 +1,13 @@
 import { Request, Response } from 'express'
 import { prisma } from '../prisma/client'
 import * as chatService from '../services/chat.service'
+import { GeminiServiceResponse, generateResponse } from '../services/gemini.service'
 
 export const createThread = async (req: Request, res: Response): Promise<any> => {
   try {
-    const content = req.body.content
+    const { content, instruction } = req.body
     const user = req.user
+
     if (!content) {
       return res.status(400).json({
         success: false,
@@ -13,37 +15,59 @@ export const createThread = async (req: Request, res: Response): Promise<any> =>
       })
     }
 
-    const random = Math.random()
-    const aiMessage = {
-      content: `new replay from ai ${random}`,
-      title: `${random}`,
+    const aiResult: GeminiServiceResponse<string> = await generateResponse(content, instruction)
+
+    if (!aiResult.success || !aiResult.data) {
+      console.error('AI generation failed:', aiResult.error)
+      const fallbackResponse =
+        "I'm sorry, I'm having trouble responding right now. Please try again."
+
+      const fallbackTitle = content.length > 30 ? content.substring(0, 30) + '...' : content
+
+      const thread = await prisma.thread.create({
+        data: {
+          title: fallbackTitle,
+          userId: user.id,
+          message: {
+            create: [
+              { content, role: 'user' },
+              { content: fallbackResponse, role: 'assistant' },
+            ],
+          },
+        },
+        include: {
+          message: { orderBy: { createdAt: 'asc' } },
+        },
+      })
+
+      return res.status(201).json({
+        success: true,
+        data: thread,
+        message: 'Thread created with fallback response',
+        warning: 'AI service temporarily unavailable',
+      })
     }
+    const aiResponse = aiResult.data
 
     const thread = await prisma.thread.create({
       data: {
-        title: aiMessage.title,
+        title: 'hello world',
         userId: user.id,
         message: {
-          create: {
-            content,
-            role: 'user',
-          },
+          create: [
+            { content, role: 'user' },
+            { content: aiResponse, role: 'assistant' },
+          ],
         },
       },
       include: {
-        message: true,
+        message: { orderBy: { createdAt: 'asc' } },
       },
     })
 
-    const result = await chatService.addMessage(thread.id, aiMessage.content, 'assistant')
-
-    if (!result.success) {
-      return res.status(500).json(result)
-    }
-
     return res.status(201).json({
       success: true,
-      data: result.data,
+      data: thread,
       message: 'Thread created successfully',
     })
   } catch (error) {
