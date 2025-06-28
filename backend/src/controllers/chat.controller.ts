@@ -2,10 +2,12 @@ import { Request, Response } from 'express'
 import { prisma } from '../prisma/client'
 import * as chatService from '../services/chat.service'
 import {
-  GeminiServiceResponse,
-  generateChatResponse,
+  sendMessageToChat,
   generateResponse,
   generateThreadTitle,
+  initializeChatWithHistory,
+  cleanupChatSession,
+  sendMessageToChatStream,
 } from '../services/gemini.service'
 
 export const createThread = async (req: Request, res: Response): Promise<any> => {
@@ -20,13 +22,14 @@ export const createThread = async (req: Request, res: Response): Promise<any> =>
       })
     }
 
-    const aiResult: GeminiServiceResponse<string> = await generateResponse(content, instruction)
+    // Generate AI response for the first message
+    const aiResult = await generateResponse(content, instruction)
 
     if (!aiResult.success || !aiResult.data) {
       console.error('AI generation failed:', aiResult.error)
+
       const fallbackResponse =
         "I'm sorry, I'm having trouble responding right now. Please try again."
-
       const fallbackTitle = content.length > 30 ? content.substring(0, 30) + '...' : content
 
       const thread = await prisma.thread.create({
@@ -52,15 +55,19 @@ export const createThread = async (req: Request, res: Response): Promise<any> =>
         warning: 'AI service temporarily unavailable',
       })
     }
+
     const aiResponse = aiResult.data
 
+    // Generate thread title
     const titleResult = await generateThreadTitle(content)
-    const threadTitle = titleResult.success
-      ? titleResult.data
-      : content.length > 30
-        ? content.substring(0, 30) + '...'
-        : content
+    const threadTitle =
+      titleResult.success && titleResult.data
+        ? titleResult.data
+        : content.length > 30
+          ? content.substring(0, 30) + '...'
+          : content
 
+    // Create thread in database
     const thread = await prisma.thread.create({
       data: {
         title: threadTitle,
@@ -76,6 +83,13 @@ export const createThread = async (req: Request, res: Response): Promise<any> =>
         message: { orderBy: { createdAt: 'asc' } },
       },
     })
+
+    // Initialize chat session for future messages
+    const messages = [
+      { role: 'user' as const, content },
+      { role: 'assistant' as const, content: aiResponse },
+    ]
+    await initializeChatWithHistory(thread.id, messages, instruction)
 
     return res.status(201).json({
       success: true,
@@ -169,6 +183,7 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
   try {
     const { content } = req.body
     const { threadId } = req.params
+
     if (!content) {
       return res.status(400).json({
         success: false,
@@ -176,20 +191,34 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
       })
     }
 
+    // Add user message to database first
     const userResult = await chatService.addMessage(threadId, content, 'user')
-
     if (!userResult.success) {
       return res.status(400).json(userResult)
     }
 
     const thread = userResult.data
+
+    // Check if we need to initialize chat session with history
+    // This happens when the chat session doesn't exist (server restart, etc.)
     const messages = thread.message.map((msg: any) => ({
       role: msg.role as 'user' | 'assistant',
       content: msg.content,
     }))
 
-    // Generate AI response with context
-    const aiResult = await generateChatResponse(messages)
+    // Initialize chat with history if this is the first API call for this thread
+    if (messages.length <= 1) {
+      // New conversation, use simple response
+      await initializeChatWithHistory(threadId, [])
+    } else {
+      // Existing conversation, initialize with history minus the last message
+      // (since we'll send it as the new message)
+      const historyMessages = messages.slice(0, -1)
+      await initializeChatWithHistory(threadId, historyMessages)
+    }
+
+    // Generate AI response using chat session
+    const aiResult = await sendMessageToChat(threadId, content)
 
     if (!aiResult.success || !aiResult.data) {
       console.error('AI generation failed:', aiResult.error)
@@ -209,8 +238,8 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
 
     const aiResponse = aiResult.data
 
+    // Add AI response to database
     const assistantResult = await chatService.addMessage(threadId, aiResponse, 'assistant')
-
     if (!assistantResult.success) {
       return res.status(500).json(assistantResult)
     }
@@ -221,7 +250,7 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
       message: 'Message added successfully',
     })
   } catch (error) {
-    console.error('Error creating thread:', error)
+    console.error('Error adding message:', error)
     return res.status(500).json({
       success: false,
       message: 'Error Adding Message',
