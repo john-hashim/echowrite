@@ -33,7 +33,7 @@ export const generateResponse = async (
       'You are a helpful AI assistant. Provide clear, accurate, and helpful responses.'
     const instruction = systemInstruction || defaultInstruction
 
-    const prompt = `${instruction}
+    const prompt = `${instruction}'
 
 User: ${userMessage}
 
@@ -43,7 +43,6 @@ Please provide a helpful response.`
       model: 'gemini-2.0-flash-001',
       contents: prompt,
     })
-    console.log(response)
     return {
       success: true,
       data: response.text,
@@ -53,6 +52,42 @@ Please provide a helpful response.`
     return {
       success: false,
       message: 'Failed to generate AI response',
+      error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    }
+  }
+}
+
+export const generateThreadTitle = async (
+  userMessage: string
+): Promise<GeminiServiceResponse<string>> => {
+  try {
+    const ai = initializeGemini()
+
+    const prompt = `Generate a short, descriptive title (maximum 3 words) for a conversation that starts with this message:
+
+"${userMessage}"
+
+Respond with only the title, no quotes or extra text.`
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-001',
+      contents: prompt,
+    })
+
+    let title = ''
+    if (response && response.text) {
+      title = response.text.trim()
+    }
+
+    return {
+      success: true,
+      data: title,
+      message: 'Thread title generated successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Failed to generate thread title',
       error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     }
   }

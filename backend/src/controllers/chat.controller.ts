@@ -1,7 +1,11 @@
 import { Request, Response } from 'express'
 import { prisma } from '../prisma/client'
 import * as chatService from '../services/chat.service'
-import { GeminiServiceResponse, generateResponse } from '../services/gemini.service'
+import {
+  GeminiServiceResponse,
+  generateResponse,
+  generateThreadTitle,
+} from '../services/gemini.service'
 
 export const createThread = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -49,9 +53,16 @@ export const createThread = async (req: Request, res: Response): Promise<any> =>
     }
     const aiResponse = aiResult.data
 
+    const titleResult = await generateThreadTitle(content)
+    const threadTitle = titleResult.success
+      ? titleResult.data
+      : content.length > 30
+        ? content.substring(0, 30) + '...'
+        : content
+
     const thread = await prisma.thread.create({
       data: {
-        title: 'hello world',
+        title: threadTitle,
         userId: user.id,
         message: {
           create: [
