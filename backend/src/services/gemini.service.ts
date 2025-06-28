@@ -74,7 +74,7 @@ Respond with only the title, no quotes or extra text.`
       contents: prompt,
     })
 
-    let title = ''
+    let title = userMessage.split(' ')[0]
     if (response && response.text) {
       title = response.text.trim()
     }
@@ -88,6 +88,45 @@ Respond with only the title, no quotes or extra text.`
     return {
       success: false,
       message: 'Failed to generate thread title',
+      error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    }
+  }
+}
+
+export const generateChatResponse = async (
+  messages: ChatMessage[],
+  systemInstruction?: string
+): Promise<GeminiServiceResponse<string>> => {
+  try {
+    const ai = initializeGemini()
+
+    // Convert messages to Gemini format
+    const contents = messages.map(msg => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }],
+    }))
+
+    if (systemInstruction) {
+      contents.unshift({
+        role: 'user',
+        parts: [{ text: `System: ${systemInstruction}` }],
+      })
+    }
+
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.0-flash-001',
+      contents,
+    })
+
+    return {
+      success: true,
+      data: response.text,
+      message: 'Chat response generated successfully',
+    }
+  } catch (error) {
+    return {
+      success: false,
+      message: 'Failed to generate chat response',
       error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     }
   }

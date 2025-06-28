@@ -3,6 +3,7 @@ import { prisma } from '../prisma/client'
 import * as chatService from '../services/chat.service'
 import {
   GeminiServiceResponse,
+  generateChatResponse,
   generateResponse,
   generateThreadTitle,
 } from '../services/gemini.service'
@@ -175,18 +176,40 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
       })
     }
 
-    const random = Math.random()
-    const aiMessage = {
-      content: `new replay from ai ${random}`,
-    }
-
     const userResult = await chatService.addMessage(threadId, content, 'user')
 
     if (!userResult.success) {
       return res.status(400).json(userResult)
     }
 
-    const assistantResult = await chatService.addMessage(threadId, aiMessage.content, 'assistant')
+    const thread = userResult.data
+    const messages = thread.message.map((msg: any) => ({
+      role: msg.role as 'user' | 'assistant',
+      content: msg.content,
+    }))
+
+    // Generate AI response with context
+    const aiResult = await generateChatResponse(messages)
+
+    if (!aiResult.success || !aiResult.data) {
+      console.error('AI generation failed:', aiResult.error)
+
+      // Add fallback message
+      const fallbackMessage =
+        "I'm having trouble responding right now. Could you please rephrase your message?"
+      const fallbackResult = await chatService.addMessage(threadId, fallbackMessage, 'assistant')
+
+      return res.status(200).json({
+        success: true,
+        data: fallbackResult.data,
+        message: 'Message added with fallback response',
+        warning: 'AI service temporarily unavailable',
+      })
+    }
+
+    const aiResponse = aiResult.data
+
+    const assistantResult = await chatService.addMessage(threadId, aiResponse, 'assistant')
 
     if (!assistantResult.success) {
       return res.status(500).json(assistantResult)
@@ -195,7 +218,7 @@ export const addMessage = async (req: Request, res: Response): Promise<any> => {
     return res.status(200).json({
       success: true,
       data: assistantResult.data,
-      message: 'Message Added successfully',
+      message: 'Message added successfully',
     })
   } catch (error) {
     console.error('Error creating thread:', error)
