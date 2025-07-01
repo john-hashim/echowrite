@@ -6,7 +6,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Suspense } from 'react'
 import { useAuth } from './contexts/AuthContext'
-import { useUserStore } from '@/store/userStore'
+import { useAppStore } from './store/appStore'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -44,7 +44,7 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children, requiresTone = false }: ProtectedRouteProps) {
   const { isAuthenticated } = useAuth()
-  const user = useUserStore(state => state.user)
+  const user = useAppStore(state => state.user)
   const location = useLocation()
 
   if (!isAuthenticated) {
@@ -58,7 +58,7 @@ function ProtectedRoute({ children, requiresTone = false }: ProtectedRouteProps)
 
   // If user has tone but is trying to access setup-tone, redirect to chat
   if (!requiresTone && user?.toneText && location.pathname === '/setup-tone') {
-    return <Navigate to="/chat" replace />
+    return <Navigate to="/chat/new" replace />
   }
 
   return <>{children}</>
@@ -71,11 +71,15 @@ interface PublicRouteProps {
 
 function PublicRoute({ children }: PublicRouteProps) {
   const { isAuthenticated } = useAuth()
-  const user = useUserStore(state => state.user)
+  const user = useAppStore(state => state.user)
 
   if (isAuthenticated) {
     // If authenticated, redirect based on toneText status
-    return user?.toneText ? <Navigate to="/chat" replace /> : <Navigate to="/setup-tone" replace />
+    return user?.toneText ? (
+      <Navigate to="/chat/new" replace />
+    ) : (
+      <Navigate to="/setup-tone" replace />
+    )
   }
 
   return <>{children}</>
@@ -84,7 +88,7 @@ function PublicRoute({ children }: PublicRouteProps) {
 // Main Routes Component
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth()
-  const user = useUserStore(state => state.user)
+  const user = useAppStore(state => state.user)
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -104,7 +108,7 @@ function AppRoutes() {
         element={
           isAuthenticated ? (
             user?.toneText ? (
-              <Navigate to="/chat" replace />
+              <Navigate to="/chat/new" replace />
             ) : (
               <Navigate to="/setup-tone" replace />
             )
@@ -144,9 +148,16 @@ function AppRoutes() {
         }
       />
 
-      {/* Chat route - requires auth and toneText */}
+      {/* Chat routes - requires auth and toneText */}
+      <Route path="/chat" element={<Navigate to={'/chat/new'} replace />} />
+
       <Route
-        path="/chat"
+        path="/chat/new"
+        element={<ProtectedRoute requiresTone={true}>{getRouteElement('/chat')}</ProtectedRoute>}
+      />
+
+      <Route
+        path="/chat/:threadId"
         element={<ProtectedRoute requiresTone={true}>{getRouteElement('/chat')}</ProtectedRoute>}
       />
 

@@ -21,6 +21,12 @@ export const ENDPOINTS = {
   },
   FEATURE: {
     SET_TONE: '/user/tone',
+    ADD_NEW_THREAD: '/chat/new',
+    GET_THREADS: '/chat',
+    GET_THREAD: '/chat/:threadID',
+    ADD_MESSAGE: '/chat/:threadID/message',
+    UPDATE_THREAD: '/chat/:threadID',
+    DELETE_THREAD: '/chat/:threadID',
   },
 } as const
 

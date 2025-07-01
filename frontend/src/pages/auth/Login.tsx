@@ -24,10 +24,10 @@ import {
 } from '@/api/services/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
-import { useUserStore } from '@/store/userStore'
+import { useAppStore } from '@/store/appStore'
 
 const Login: React.FC = () => {
-  const { setUser } = useUserStore()
+  const { setUser } = useAppStore()
 
   const [formData, setFormData] = useState({
     email: '',

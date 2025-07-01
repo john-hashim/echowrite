@@ -4,18 +4,18 @@ import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { authService, UserResponse } from '@/api/services/auth'
 import { useApi } from '@/hooks/useApi'
-import { useUserStore } from '@/store/userStore'
 import { Textarea } from '@/components/ui/textarea'
 import { featureService } from '@/api/services/feature'
+import { useAppStore } from '@/store/appStore'
 
 const SetupTone: React.FC = () => {
   const [toneText, setToneText] = useState('')
 
   const { logout } = useAuth()
   const navigate = useNavigate()
-  const { logout: zustandLogout } = useUserStore()
+  const { logout: zustandLogout } = useAppStore()
 
-  const { setUser } = useUserStore()
+  const { setUser } = useAppStore()
 
   const { execute: executeLogout } = useApi<{ success: boolean }, []>(authService.logout)
   const { execute: executeSetTone } = useApi<{ message: string; user: UserResponse }, [string]>(
