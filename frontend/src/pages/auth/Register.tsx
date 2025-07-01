@@ -14,11 +14,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { AuthResponse, authService, GoogleSignInRequest, RegisterData } from '@/api/services/auth'
+import { authService } from '@/api/services/auth'
+import { AuthResponse, GoogleSignInRequest, RegisterData } from '@/types/auth'
 import { useApi } from '@/hooks/useApi'
 import { Spinner } from '@/components/ui/spinner'
 import { useAuth } from '@/contexts/AuthContext'
-import { useUserStore } from '@/store/userStore'
+import { useAppStore } from '@/store/appStore'
 
 const Register: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +35,7 @@ const Register: React.FC = () => {
 
   const navigate = useNavigate()
 
-  const { setUser } = useUserStore()
+  const { setUser } = useAppStore()
   const { login } = useAuth()
 
   const {

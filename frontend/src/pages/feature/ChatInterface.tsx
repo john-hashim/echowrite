@@ -5,6 +5,7 @@ import { featureService } from '@/api/services/feature'
 import { ApiResponse, Thread } from '@/types/chat'
 import { useApi } from '@/hooks/useApi'
 import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 
 interface ChatInterfaceProps {
   threadId?: string
@@ -13,12 +14,21 @@ interface ChatInterfaceProps {
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
   const [newThreadFlag, setNewThreadFlag] = useState(true)
   const [messageText, setMessageText] = useState('')
+  const navigate = useNavigate()
 
   const { execute: executeGetThread, error: apiError } = useApi<ApiResponse<Thread>, [string]>(
     featureService.getThread
   )
 
-  const { updateThread } = useAppStore()
+  const { execute: executeAddMessage } = useApi<ApiResponse<Thread>, [string, string]>(
+    featureService.addMessage
+  )
+
+  const { execute: executeAddThread } = useApi<ApiResponse<Thread>, [string]>(
+    featureService.addThread
+  )
+
+  const { updateThread, unshiftThread } = useAppStore()
 
   useEffect(() => {
     if (threadId) {
@@ -46,10 +56,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
 
   const thread = useAppStore(state => state.threads.find(t => t.id === threadId))
 
-  const handleSendMessage = () => {
-    if (messageText.trim()) {
-      console.log('Sending message:', messageText)
-      setMessageText('')
+  const handleSendMessage = async () => {
+    try {
+      if (messageText && thread) {
+        const res = await executeAddMessage(thread.id, messageText)
+        updateThread(res.data)
+        setMessageText('')
+      } else {
+        const res = await executeAddThread(messageText)
+        unshiftThread(res.data)
+        setMessageText('')
+        navigate(`/chat/${res.data.id}`)
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
@@ -64,6 +84,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
 
   return (
     <div className="h-full bg-gray-50 dark:bg-gray-900 flex flex-col">
+      <div className="border-t border-gray-500 dark:border-gray-700 bg-white dark:bg-gray-800 p-4">
+        <div className="flex items-end space-x-3">
+          <div className="flex-1">{thread?.title}</div>
+        </div>
+      </div>
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {newThreadFlag ? (
@@ -133,7 +158,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
           <button
             onClick={handleSendMessage}
             disabled={!messageText.trim()}
-            className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-full p-3 transition-colors duration-200"
+            className="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 cursor-pointer text-white rounded-full p-3 transition-colors duration-200"
           >
             <Send className="w-5 h-5" />
           </button>

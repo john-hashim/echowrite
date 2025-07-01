@@ -23,11 +23,20 @@ export const featureService = {
     return apiClient.delete(URL)
   },
 
+  addMessage: (threadId: string, content: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
+    const URL = ENDPOINTS.FEATURE.ADD_MESSAGE.replace(':threadID', threadId)
+    return apiClient.post(URL, { content })
+  },
+
   updateThread: (
     threadId: string,
     title: string
   ): Promise<AxiosResponse<ApiResponse<Thread[]>>> => {
     const URL = ENDPOINTS.FEATURE.UPDATE_THREAD.replace(':threadID', threadId)
     return apiClient.put(URL, { title })
+  },
+
+  addThread: (content: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
+    return apiClient.post(ENDPOINTS.FEATURE.ADD_NEW_THREAD, { content })
   },
 }

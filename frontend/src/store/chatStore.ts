@@ -14,6 +14,15 @@ export const createChatSlice: StateCreator<
 
   setThreads: (threads: Thread[]) =>
     set(state => ({ ...state, threads, error: null }), false, 'setThreads'),
+  unshiftThread: (thread: Thread) =>
+    set(
+      state => ({
+        ...state,
+        threads: [thread, ...state.threads],
+      }),
+      false,
+      'unshiftThread'
+    ),
   setLoading: (isLoading: boolean) => set(state => ({ ...state, isLoading }), false, 'setLoading'),
   setError: (error: string | null) => set(state => ({ ...state, error }), false, 'setError'),
   clearError: () => set(state => ({ ...state, error: null }), false, 'clearError'),

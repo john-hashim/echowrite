@@ -6,6 +6,7 @@ export interface ChatSlice {
   isLoading: boolean
   error: string | null
   setThreads: (threads: Thread[]) => void
+  unshiftThread: (thread: Thread) => void
   setLoading: (isLoading: boolean) => void
   setError: (error: string | null) => void
   clearError: () => void

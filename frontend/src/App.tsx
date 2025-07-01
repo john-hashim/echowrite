@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@/contexts/theme-provider'
-import { ThemeToggle } from '@/components/common/theme-toggle'
+// import { ThemeToggle } from '@/components/common/theme-toggle'
 import routes from './routes'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
@@ -16,13 +16,13 @@ function App() {
   }
 
   return (
-    <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <GoogleOAuthProvider clientId={googleClientId || ''}>
         <AuthProvider>
           <BrowserRouter>
-            <div className="fixed top-4 right-4 z-50">
+            {/* <div className="fixed top-4 right-4 z-50">
               <ThemeToggle />
-            </div>
+            </div> */}
             <Suspense
               fallback={
                 <div className="flex min-h-screen items-center justify-center">Loading...</div>

@@ -17,7 +17,6 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
   const navigate = useNavigate()
 
   const {
-    threads,
     isLoading: storeLoading,
     error,
     setThreads,
@@ -26,6 +25,8 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
     clearError,
     deleteThread,
   } = useAppStore()
+
+  const threads = useAppStore(state => state.threads)
 
   const {
     execute: executeGetThreads,
@@ -55,6 +56,7 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
       if (res?.success) {
         deleteThread(res.data.id)
         toast('Chat successfully deleted')
+        handleNewChat()
       } else {
         toast('Error in deleting chat')
       }

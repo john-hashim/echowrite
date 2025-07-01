@@ -13,14 +13,14 @@ import { Input } from '@/components/ui/input'
 import { Loader2, CheckCircle2, Mail } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { authService } from '@/api/services/auth'
 import {
-  authService,
   EmailVerificationSendApiResponce,
   verificationResponce,
   verifyOtpParams,
-} from '@/api/services/auth'
+} from '@/types/auth'
 import { useApi } from '@/hooks/useApi'
-import { useUserStore } from '@/store/userStore'
+import { useAppStore } from '@/store/appStore'
 
 const EmailVerification: React.FC = () => {
   const [otp, setOtp] = useState<string[]>(Array(6).fill(''))
@@ -35,7 +35,7 @@ const EmailVerification: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { login } = useAuth()
-  const { setUser } = useUserStore()
+  const { setUser } = useAppStore()
 
   const state = location.state
   const userEmail = state?.email || ''
