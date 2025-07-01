@@ -13,6 +13,11 @@ export const featureService = {
     return apiClient.get(ENDPOINTS.FEATURE.GET_THREADS)
   },
 
+  getThread: (threadId: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
+    const URL = ENDPOINTS.FEATURE.GET_THREAD.replace(':threadID', threadId)
+    return apiClient.get(URL)
+  },
+
   deleteThread: (threadId: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
     const URL = ENDPOINTS.FEATURE.DELETE_THREAD.replace(':threadID', threadId)
     return apiClient.delete(URL)

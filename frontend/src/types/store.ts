@@ -10,6 +10,8 @@ export interface ChatSlice {
   setError: (error: string | null) => void
   clearError: () => void
   deleteThread: (thread: string) => void
+  updateThread: (thread: Thread) => void
+  getThread: (threadId: string) => Thread | undefined
 }
 
 export interface UserSlice {

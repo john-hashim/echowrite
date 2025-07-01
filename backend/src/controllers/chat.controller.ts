@@ -113,11 +113,11 @@ export const getThreads = async (req: Request, res: Response): Promise<any> => {
       where: {
         userId: user.id,
       },
-      include: {
-        message: {
-          orderBy: { createdAt: 'asc' },
-        },
-      },
+      // include: {
+      //   message: {
+      //     orderBy: { createdAt: 'asc' },
+      //   },
+      // },
       orderBy: {
         updatedAt: 'desc',
       },

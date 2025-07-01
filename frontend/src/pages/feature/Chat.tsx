@@ -27,8 +27,6 @@ const Chat: React.FC = () => {
     }
   }
 
-  const isNewChat = !threadId || threadId === 'new'
-
   return (
     <div className="flex h-screen bg-background">
       {/* Sidebar */}
@@ -36,7 +34,7 @@ const Chat: React.FC = () => {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        <ChatInterface threadId={threadId} isNewChat={isNewChat} />
+        <ChatInterface threadId={threadId} />
       </div>
     </div>
   )

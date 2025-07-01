@@ -14,5 +14,5 @@ export const createUserSlice: StateCreator<
   setUser: (user: UserResponse) => set(state => ({ ...state, user }), false, 'setUser'),
   clearUser: () => set(state => ({ ...state, user: null }), false, 'clearUser'),
   setLoading: (isLoading: boolean) => set(state => ({ ...state, isLoading }), false, 'setLoading'),
-  logout: () => set(state => ({ ...state, user: null }), false, 'logout'),
+  logout: () => set(state => ({ ...state, user: null, threads: [] }), false, 'logout'),
 })

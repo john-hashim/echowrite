@@ -7,7 +7,7 @@ export const createChatSlice: StateCreator<
   [['zustand/devtools', never]],
   [],
   ChatSlice
-> = set => ({
+> = (set, get) => ({
   threads: [],
   isLoading: false,
   error: null,
@@ -19,4 +19,17 @@ export const createChatSlice: StateCreator<
   clearError: () => set(state => ({ ...state, error: null }), false, 'clearError'),
   deleteThread: (threadId: string) =>
     set(state => ({ ...state, threads: state.threads.filter(threads => threads.id !== threadId) })),
+  updateThread: (thread: Thread) =>
+    set(
+      state => ({
+        ...state,
+        threads: state.threads.map(t => (t.id === thread.id ? thread : t)),
+      }),
+      false,
+      'updateThread'
+    ),
+  getThread: (threadId: string) => {
+    const state = get()
+    return state.threads.find(thread => thread.id === threadId)
+  },
 })
