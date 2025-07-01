@@ -1,10 +1,12 @@
-import { ApiResponse, featureService, Thread } from '@/api/services/feature'
+import { featureService } from '@/api/services/feature'
+import { Thread, ApiResponse } from '@/types/chat'
 import { Button } from '@/components/ui/button'
 import { useApi } from '@/hooks/useApi'
 import { useAppStore } from '@/store/appStore'
 import { MessageSquarePlus, MessageSquare, LogOut, Trash2, Loader2 } from 'lucide-react'
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 
 interface ThreadSidebarProps {
   currentThreadId?: string
@@ -22,14 +24,20 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
     setLoading,
     setError,
     clearError,
+    deleteThread,
   } = useAppStore()
 
   const {
     execute: executeGetThreads,
     loading: apiLoading,
-    data,
+    data: threadsData,
     error: apiError,
   } = useApi<ApiResponse<Thread[]>, []>(featureService.getThreads)
+
+  const { execute: executeDeleteThread, loading: deleteApiLoading } = useApi<
+    ApiResponse<Thread>,
+    [string]
+  >(featureService.deleteThread)
 
   const handleNewChat = () => {
     navigate('/chat/new')
@@ -41,14 +49,22 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
 
   const handleDeleteThread = async (threadId: string, e: React.MouseEvent) => {
     e.stopPropagation()
+
     try {
-      console.log('Thread deleted:', threadId)
+      const res = await executeDeleteThread(threadId)
+      if (res?.success) {
+        deleteThread(res.data.id)
+        toast('Chat successfully deleted')
+      } else {
+        toast('Error in deleting chat')
+      }
     } catch (error) {
-      setError('Failed to delete thread')
       console.error('Delete thread error:', error)
+      toast('Error in deleting chat')
     }
   }
 
+  // Load threads on component mount
   useEffect(() => {
     const loadThreads = async () => {
       try {
@@ -65,12 +81,14 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
     loadThreads()
   }, [executeGetThreads, setLoading, setError, clearError])
 
+  // Handle threads data updates
   useEffect(() => {
-    if (data?.success && data.data) {
-      setThreads(data.data)
+    if (threadsData?.success && threadsData.data) {
+      setThreads(threadsData.data)
     }
-  }, [data, setThreads])
+  }, [threadsData, setThreads])
 
+  // Handle API errors for loading threads
   useEffect(() => {
     if (apiError) {
       setError('Failed to load threads')
@@ -94,6 +112,7 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
         </Button>
       </div>
 
+      {/* Show general errors */}
       {error && (
         <div className="p-4 text-sm text-red-500 bg-red-50 border-b border-red-200">{error}</div>
       )}
@@ -107,7 +126,7 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
 
       <div className="flex-1 overflow-y-auto">
         <div className="space-y-1 p-2">
-          {threads.map(thread => (
+          {threads.map((thread: Thread) => (
             <div
               key={thread.id}
               className={`group relative p-3 rounded-lg cursor-pointer hover:bg-accent transition-colors ${
@@ -128,8 +147,13 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
                   size="sm"
                   className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0"
                   onClick={e => handleDeleteThread(thread.id, e)}
+                  disabled={deleteApiLoading}
                 >
-                  <Trash2 className="h-3 w-3" />
+                  {deleteApiLoading ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
                 </Button>
               </div>
             </div>

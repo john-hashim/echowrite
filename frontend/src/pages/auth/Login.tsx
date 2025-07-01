@@ -16,12 +16,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 
 import { useApi } from '@/hooks/useApi'
-import {
-  authService,
-  LoginCredentials,
-  AuthResponse,
-  GoogleSignInRequest,
-} from '@/api/services/auth'
+import { authService } from '@/api/services/auth'
+import { LoginCredentials, AuthResponse, GoogleSignInRequest } from '@/types/auth'
 import { useAuth } from '@/contexts/AuthContext'
 import { Spinner } from '@/components/ui/spinner'
 import { useAppStore } from '@/store/appStore'

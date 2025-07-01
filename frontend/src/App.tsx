@@ -7,6 +7,7 @@ import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Suspense } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { useAppStore } from './store/appStore'
+import { AppStore } from './types/store'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -44,7 +45,7 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children, requiresTone = false }: ProtectedRouteProps) {
   const { isAuthenticated } = useAuth()
-  const user = useAppStore(state => state.user)
+  const user = useAppStore((state: AppStore) => state.user)
   const location = useLocation()
 
   if (!isAuthenticated) {
@@ -71,7 +72,7 @@ interface PublicRouteProps {
 
 function PublicRoute({ children }: PublicRouteProps) {
   const { isAuthenticated } = useAuth()
-  const user = useAppStore(state => state.user)
+  const user = useAppStore((state: AppStore) => state.user)
 
   if (isAuthenticated) {
     // If authenticated, redirect based on toneText status
@@ -88,7 +89,7 @@ function PublicRoute({ children }: PublicRouteProps) {
 // Main Routes Component
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useAuth()
-  const user = useAppStore(state => state.user)
+  const user = useAppStore((state: AppStore) => state.user)
 
   // Show loading state while checking authentication
   if (isLoading) {

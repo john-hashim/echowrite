@@ -1,16 +1,15 @@
 import { create } from 'zustand'
 import { devtools, persist } from 'zustand/middleware'
-import { createChatSlice, ChatSlice } from './chatStore'
-import { createUserSlice, UserSlice } from './userStore'
-
-type AppStore = ChatSlice & UserSlice
+import { createChatSlice } from './chatStore'
+import { createUserSlice } from './userStore'
+import type { AppStore } from '@/types/store'
 
 export const useAppStore = create<AppStore>()(
   devtools(
     persist(
-      set => ({
-        ...createChatSlice(set),
-        ...createUserSlice(set),
+      (...a) => ({
+        ...createChatSlice(...a),
+        ...createUserSlice(...a),
       }),
       {
         name: 'app-storage',

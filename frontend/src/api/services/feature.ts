@@ -1,36 +1,8 @@
 import { AxiosResponse } from 'axios'
-import { UserResponse } from './auth'
+import { UserResponse } from '@/types/auth'
 import apiClient from '../index'
 import { ENDPOINTS } from '../endpoints'
-
-export interface Thread {
-  id: string
-  userId: string
-  title: string
-  createdAt: string
-  updatedAt: string
-  message?: Message[]
-}
-
-export interface Message {
-  id: string
-  threadId: string
-  content: string
-  role: Role
-  createdAt: string
-}
-
-export enum Role {
-  User = 'user',
-  Assistant = 'assistant',
-}
-
-export interface ApiResponse<T = any> {
-  success: boolean
-  data: T
-  message: string
-  count?: number
-}
+import { ApiResponse, Thread } from '@/types/chat'
 
 export const featureService = {
   setupTone: (tone: string): Promise<AxiosResponse<{ message: string; user: UserResponse }>> => {
@@ -41,7 +13,7 @@ export const featureService = {
     return apiClient.get(ENDPOINTS.FEATURE.GET_THREADS)
   },
 
-  deleteThread: (threadId: string): Promise<AxiosResponse<ApiResponse<Thread[]>>> => {
+  deleteThread: (threadId: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
     const URL = ENDPOINTS.FEATURE.DELETE_THREAD.replace(':threadID', threadId)
     return apiClient.delete(URL)
   },
