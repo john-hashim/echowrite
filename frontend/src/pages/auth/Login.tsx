@@ -133,14 +133,6 @@ const Login: React.FC = () => {
       if (response && response.token) {
         setUser(response.user)
         login(response.token, formData.rememberMe)
-        // Use setTimeout to ensure auth state is set first
-        setTimeout(() => {
-          if (!response.user.toneText) {
-            navigate('/setup-tone')
-          } else {
-            navigate('/chat')
-          }
-        }, 0)
       }
     } catch (err) {
       // Error is handled by useApi hook and will show in serverError
@@ -165,13 +157,6 @@ const Login: React.FC = () => {
       if (response && response.token) {
         setUser(response.user)
         login(response.token, true)
-        setTimeout(() => {
-          if (!response.user.toneText) {
-            navigate('/setup-tone')
-          } else {
-            navigate('/chat')
-          }
-        }, 0)
       }
     } catch (err) {
       console.error('Google login failed:', err)

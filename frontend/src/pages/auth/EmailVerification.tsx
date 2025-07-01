@@ -148,20 +148,11 @@ const EmailVerification: React.FC = () => {
       }
       setUser(response.user)
       login(response.token, false)
-      setTimeout(() => {
-        if (!response.user.toneText) {
-          navigate('/setup-tone')
-        } else {
-          navigate('/chat')
-        }
-      }, 0)
     } catch (error) {
       setVerificationError('Invalid verification code. Please try again.')
-      // Reset OTP fields for retry
       setOtp(Array(6).fill(''))
       inputRefs.current[0]?.focus()
     } finally {
-      //   setIsVerifying(false)
     }
   }
 

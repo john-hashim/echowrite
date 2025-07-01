@@ -143,13 +143,6 @@ const Register: React.FC = () => {
       if (response && response.token) {
         setUser(response.user)
         login(response.token, true)
-        setTimeout(() => {
-          if (!response.user.toneText) {
-            navigate('/setup-tone')
-          } else {
-            navigate('/chat')
-          }
-        }, 0)
       }
     } catch (err) {
       console.error('Google login failed:', err)

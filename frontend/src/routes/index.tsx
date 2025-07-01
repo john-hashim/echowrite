@@ -4,7 +4,6 @@ import { lazy } from 'react'
 // Lazy load components
 const Login = lazy(() => import('@/pages/auth/Login'))
 const Register = lazy(() => import('@/pages/auth/Register'))
-const Dashboard = lazy(() => import('@/pages/dashboard/Dashboard'))
 const EmailVerification = lazy(() => import('@/pages/auth/EmailVerification'))
 const ForgotPassword = lazy(() => import('@/pages/auth/ForgotPassword'))
 const ResetPassword = lazy(() => import('@/pages/auth/ResetPassword'))
@@ -23,10 +22,6 @@ const routes: RouteObject[] = [
   {
     path: '/register',
     element: <Register />,
-  },
-  {
-    path: '/dashboard',
-    element: <Dashboard />,
   },
   {
     path: '/verify-email',

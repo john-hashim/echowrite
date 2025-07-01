@@ -1,21 +1,23 @@
 import { ThemeProvider } from '@/contexts/theme-provider'
 import { ThemeToggle } from '@/components/common/theme-toggle'
 import routes from './routes'
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 import { Suspense } from 'react'
+import { useAuth } from './contexts/AuthContext'
+import { useUserStore } from '@/store/userStore'
 
 function App() {
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
   if (!googleClientId) {
     console.error('Google Client ID is not set in environment variables')
   }
+
   return (
     <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
       <GoogleOAuthProvider clientId={googleClientId || ''}>
         <AuthProvider>
-          {' '}
           <BrowserRouter>
             <div className="fixed top-4 right-4 z-50">
               <ThemeToggle />
@@ -34,115 +36,124 @@ function App() {
   )
 }
 
-// Separate component for routes that uses the auth context
+// Protected Route Component
+interface ProtectedRouteProps {
+  children: React.ReactNode
+  requiresTone?: boolean
+}
+
+function ProtectedRoute({ children, requiresTone = false }: ProtectedRouteProps) {
+  const { isAuthenticated } = useAuth()
+  const user = useUserStore(state => state.user)
+  const location = useLocation()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+
+  // If route requires tone but user doesn't have it, redirect to setup
+  if (requiresTone && !user?.toneText) {
+    return <Navigate to="/setup-tone" replace />
+  }
+
+  // If user has tone but is trying to access setup-tone, redirect to chat
+  if (!requiresTone && user?.toneText && location.pathname === '/setup-tone') {
+    return <Navigate to="/chat" replace />
+  }
+
+  return <>{children}</>
+}
+
+// Public Route Component (redirects authenticated users appropriately)
+interface PublicRouteProps {
+  children: React.ReactNode
+}
+
+function PublicRoute({ children }: PublicRouteProps) {
+  const { isAuthenticated } = useAuth()
+  const user = useUserStore(state => state.user)
+
+  if (isAuthenticated) {
+    // If authenticated, redirect based on toneText status
+    return user?.toneText ? <Navigate to="/chat" replace /> : <Navigate to="/setup-tone" replace />
+  }
+
+  return <>{children}</>
+}
+
+// Main Routes Component
 function AppRoutes() {
-  const { isAuthenticated, isLoading } = useAuth() // Use the auth hook
+  const { isAuthenticated, isLoading } = useAuth()
+  const user = useUserStore(state => state.user)
 
   // Show loading state while checking authentication
   if (isLoading) {
     return <div className="flex min-h-screen items-center justify-center">Loading...</div>
   }
 
+  // Helper function to find route element
+  const getRouteElement = (path: string) => {
+    return routes.find(r => r.path === path)?.element
+  }
+
   return (
     <Routes>
+      {/* Root redirect */}
       <Route
         path="/"
         element={
-          isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/login" replace />
+          isAuthenticated ? (
+            user?.toneText ? (
+              <Navigate to="/chat" replace />
+            ) : (
+              <Navigate to="/setup-tone" replace />
+            )
+          ) : (
+            <Navigate to="/login" replace />
+          )
         }
       />
 
-      {/* Public routes accessible to everyone */}
-      <Route
-        path="/login"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            routes.find(r => r.path === '/login')?.element
-          )
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            routes.find(r => r.path === '/register')?.element
-          )
-        }
-      />
+      {/* Public routes - accessible only when not authenticated */}
+      <Route path="/login" element={<PublicRoute>{getRouteElement('/login')}</PublicRoute>} />
+
+      <Route path="/register" element={<PublicRoute>{getRouteElement('/register')}</PublicRoute>} />
+
       <Route
         path="/forgot-password"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            routes.find(r => r.path === '/forgot-password')?.element
-          )
-        }
+        element={<PublicRoute>{getRouteElement('/forgot-password')}</PublicRoute>}
       />
+
       <Route
         path="/reset-password"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            routes.find(r => r.path === '/reset-password')?.element
-          )
-        }
+        element={<PublicRoute>{getRouteElement('/reset-password')}</PublicRoute>}
+      />
+
+      <Route
+        path="/verify-email"
+        element={<PublicRoute>{getRouteElement('/verify-email')}</PublicRoute>}
       />
 
       {/* Protected routes that require authentication */}
-      <Route
-        path="/dashboard"
-        element={
-          isAuthenticated ? (
-            routes.find(r => r.path === '/dashboard')?.element
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
-      />
+
+      {/* Setup tone route - requires auth but not toneText */}
       <Route
         path="/setup-tone"
         element={
-          isAuthenticated ? (
-            routes.find(r => r.path === '/setup-tone')?.element
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          <ProtectedRoute requiresTone={false}>{getRouteElement('/setup-tone')}</ProtectedRoute>
         }
       />
+
+      {/* Chat route - requires auth and toneText */}
       <Route
         path="/chat"
-        element={
-          isAuthenticated ? (
-            routes.find(r => r.path === '/chat')?.element
-          ) : (
-            <Navigate to="/login" replace />
-          )
-        }
+        element={<ProtectedRoute requiresTone={true}>{getRouteElement('/chat')}</ProtectedRoute>}
       />
-      <Route
-        path="/verify-email"
-        element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            routes.find(r => r.path === '/verify-email')?.element
-          )
-        }
-      />
-      {/* Add other protected routes in a similar way */}
 
+      {/* Catch all route - redirect to root */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
-
-// Don't forget to import useAuth
-import { useAuth } from './contexts/AuthContext'
 
 export default App
