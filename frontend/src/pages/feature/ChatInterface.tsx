@@ -31,6 +31,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
   const { updateThread, unshiftThread } = useAppStore()
 
   useEffect(() => {
+    console.log(threadId)
     if (threadId) {
       setNewThreadFlag(false)
       executeGetThread(threadId)

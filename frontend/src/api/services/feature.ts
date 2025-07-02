@@ -28,10 +28,7 @@ export const featureService = {
     return apiClient.post(URL, { content })
   },
 
-  updateThread: (
-    threadId: string,
-    title: string
-  ): Promise<AxiosResponse<ApiResponse<Thread[]>>> => {
+  updateThread: (threadId: string, title: string): Promise<AxiosResponse<ApiResponse<Thread>>> => {
     const URL = ENDPOINTS.FEATURE.UPDATE_THREAD.replace(':threadID', threadId)
     return apiClient.put(URL, { title })
   },
