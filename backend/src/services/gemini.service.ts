@@ -27,6 +27,8 @@ const redis = new Redis({
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD,
   db: parseInt(process.env.REDIS_DB || '0'),
+  maxRetriesPerRequest: 50,
+  tls: {},
 })
 
 // Redis key prefix for chat sessions
@@ -112,7 +114,6 @@ const retrieveChatSession = async (threadId: string): Promise<any | null> => {
     }
 
     const sessionData: SerializedChatSession = JSON.parse(sessionDataStr)
-    console.log(sessionDataStr)
     // Update last used timestamp
     sessionData.lastUsed = Date.now()
     await redis.setex(
