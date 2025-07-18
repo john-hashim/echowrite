@@ -147,20 +147,6 @@ export const sendMessageToChatStream = async (
   }
 }
 
-// Clean up chat session (call when thread is deleted or inactive)
-export const cleanupChatSession = (threadId: string) => {
-  activeChatSessions.delete(threadId)
-}
-
-// Get chat history from session
-export const getChatHistory = (threadId: string) => {
-  const chat = activeChatSessions.get(threadId)
-  if (chat) {
-    return chat.getHistory()
-  }
-  return []
-}
-
 // Original functions kept for backward compatibility
 export const generateResponse = async (
   userMessage: string,
@@ -243,55 +229,6 @@ export const generateThreadTitle = async (
     return {
       success: false,
       message: 'Failed to generate thread title',
-      error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    }
-  }
-}
-
-// DEPRECATED: Use sendMessageToChat instead
-export const generateChatResponse = async (
-  messages: ChatMessage[],
-  systemInstruction?: string
-): Promise<GeminiServiceResponse<string>> => {
-  console.warn(
-    'generateChatResponse is deprecated. Use sendMessageToChat with chat sessions instead.'
-  )
-
-  try {
-    const ai = initializeGemini()
-
-    const defaultInstruction =
-      'You are a helpful AI assistant. Provide clear, accurate, and helpful responses.'
-    const instruction = systemInstruction || defaultInstruction
-
-    // Convert messages to Gemini format
-    const contents = messages.map(msg => ({
-      role: msg.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: msg.content }],
-    }))
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.0-flash-001',
-      contents,
-      config: {
-        temperature: 0.7,
-        maxOutputTokens: 1000,
-        systemInstruction: {
-          role: 'system',
-          parts: [{ text: instruction }],
-        },
-      },
-    })
-
-    return {
-      success: true,
-      data: response.text,
-      message: 'Chat response generated successfully',
-    }
-  } catch (error) {
-    return {
-      success: false,
-      message: 'Failed to generate chat response',
       error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     }
   }

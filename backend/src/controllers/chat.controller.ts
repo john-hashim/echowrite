@@ -6,7 +6,6 @@ import {
   generateResponse,
   generateThreadTitle,
   initializeChatWithHistory,
-  cleanupChatSession,
   sendMessageToChatStream,
 } from '../services/gemini.service'
 
