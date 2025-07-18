@@ -1,4 +1,5 @@
 import { GoogleGenAI } from '@google/genai'
+import Redis from 'ioredis'
 
 export interface GeminiServiceResponse<T> {
   success: boolean
@@ -12,8 +13,25 @@ interface ChatMessage {
   content: string
 }
 
-// Store active chat sessions in memory (consider Redis for production)
-const activeChatSessions = new Map<string, any>()
+interface SerializedChatSession {
+  threadId: string
+  history: any[]
+  systemInstruction?: string
+  createdAt: number
+  lastUsed: number
+}
+
+// Redis client initialization
+const redis = new Redis({
+  host: process.env.REDIS_HOST || 'localhost',
+  port: parseInt(process.env.REDIS_PORT || '6379'),
+  password: process.env.REDIS_PASSWORD,
+  db: parseInt(process.env.REDIS_DB || '0'),
+})
+
+// Redis key prefix for chat sessions
+const CHAT_SESSION_PREFIX = 'chat_session:'
+const SESSION_EXPIRY = 60 * 60 * 24 * 7
 
 const initializeGemini = () => {
   const apiKey = process.env.GEMINI_API_KEY
@@ -25,13 +43,99 @@ const initializeGemini = () => {
   return new GoogleGenAI({ apiKey })
 }
 
-// Create or get existing chat session for a thread
-export const getOrCreateChatSession = (threadId: string, systemInstruction?: string) => {
+// Helper function to serialize chat session data for Redis
+const serializeChatSession = (
+  threadId: string,
+  history: any[],
+  systemInstruction?: string
+): SerializedChatSession => {
+  return {
+    threadId,
+    history,
+    systemInstruction,
+    createdAt: Date.now(),
+    lastUsed: Date.now(),
+  }
+}
+
+// Helper function to recreate chat session from Redis data
+const recreateChatSession = (sessionData: SerializedChatSession) => {
   const ai = initializeGemini()
 
-  // Check if chat session already exists
-  if (activeChatSessions.has(threadId)) {
-    return activeChatSessions.get(threadId)
+  const defaultInstruction =
+    'You are a helpful AI assistant. Provide clear, accurate, and helpful responses.'
+  const instruction = sessionData.systemInstruction || defaultInstruction
+
+  const chat = ai.chats.create({
+    model: 'gemini-2.0-flash-001',
+    config: {
+      temperature: 0.7,
+      maxOutputTokens: 1000,
+      systemInstruction: {
+        role: 'system',
+        parts: [{ text: instruction }],
+      },
+    },
+    history: sessionData.history,
+  })
+
+  return chat
+}
+
+// Store chat session in Redis
+const storeChatSession = async (
+  threadId: string,
+  chat: any,
+  systemInstruction?: string
+): Promise<void> => {
+  try {
+    const history = chat.getHistory ? chat.getHistory() : []
+    const sessionData = serializeChatSession(threadId, history, systemInstruction)
+
+    await redis.setex(
+      `${CHAT_SESSION_PREFIX}${threadId}`,
+      SESSION_EXPIRY,
+      JSON.stringify(sessionData)
+    )
+  } catch (error) {
+    console.error('Error storing chat session in Redis:', error)
+  }
+}
+
+// Retrieve chat session from Redis
+const retrieveChatSession = async (threadId: string): Promise<any | null> => {
+  try {
+    const sessionDataStr = await redis.get(`${CHAT_SESSION_PREFIX}${threadId}`)
+
+    if (!sessionDataStr) {
+      return null
+    }
+
+    const sessionData: SerializedChatSession = JSON.parse(sessionDataStr)
+    console.log(sessionDataStr)
+    // Update last used timestamp
+    sessionData.lastUsed = Date.now()
+    await redis.setex(
+      `${CHAT_SESSION_PREFIX}${threadId}`,
+      SESSION_EXPIRY,
+      JSON.stringify(sessionData)
+    )
+
+    return recreateChatSession(sessionData)
+  } catch (error) {
+    console.error('Error retrieving chat session from Redis:', error)
+    return null
+  }
+}
+
+// Create or get existing chat session for a thread
+export const getOrCreateChatSession = async (threadId: string, systemInstruction?: string) => {
+  const ai = initializeGemini()
+
+  // Check if chat session exists in Redis
+  const existingChat = await retrieveChatSession(threadId)
+  if (existingChat) {
+    return existingChat
   }
 
   const defaultInstruction =
@@ -51,8 +155,8 @@ export const getOrCreateChatSession = (threadId: string, systemInstruction?: str
     },
   })
 
-  // Store in memory
-  activeChatSessions.set(threadId, chat)
+  // Store in Redis
+  await storeChatSession(threadId, chat, systemInstruction)
   return chat
 }
 
@@ -85,11 +189,11 @@ export const initializeChatWithHistory = async (
         parts: [{ text: instruction }],
       },
     },
-    history, // This initializes the chat with conversation history
+    history,
   })
 
-  // Store in memory
-  activeChatSessions.set(threadId, chat)
+  // Store in Redis
+  await storeChatSession(threadId, chat, systemInstruction)
   return chat
 }
 
@@ -99,16 +203,19 @@ export const sendMessageToChat = async (
   message: string
 ): Promise<GeminiServiceResponse<string>> => {
   try {
-    let chat = activeChatSessions.get(threadId)
+    let chat = await retrieveChatSession(threadId)
 
     if (!chat) {
       // If no active session, create a new one
-      chat = getOrCreateChatSession(threadId)
+      chat = await getOrCreateChatSession(threadId)
     }
 
     const response = await chat.sendMessage({
       message: message,
     })
+
+    // Update the session in Redis after sending message
+    await storeChatSession(threadId, chat)
 
     return {
       success: true,
@@ -130,15 +237,18 @@ export const sendMessageToChatStream = async (
   message: string
 ): Promise<AsyncGenerator<string, void, unknown> | null> => {
   try {
-    let chat = activeChatSessions.get(threadId)
+    let chat = await retrieveChatSession(threadId)
 
     if (!chat) {
-      chat = getOrCreateChatSession(threadId)
+      chat = await getOrCreateChatSession(threadId)
     }
 
     const responseStream = await chat.sendMessageStream({
       message: message,
     })
+
+    // Update the session in Redis after streaming
+    await storeChatSession(threadId, chat)
 
     return responseStream
   } catch (error) {
@@ -231,5 +341,25 @@ export const generateThreadTitle = async (
       message: 'Failed to generate thread title',
       error: `Gemini AI error: ${error instanceof Error ? error.message : 'Unknown error'}`,
     }
+  }
+}
+
+// Redis connection health check
+export const checkRedisConnection = async (): Promise<boolean> => {
+  try {
+    await redis.ping()
+    return true
+  } catch (error) {
+    console.error('Redis connection failed:', error)
+    return false
+  }
+}
+
+// Graceful shutdown
+export const closeRedisConnection = async (): Promise<void> => {
+  try {
+    await redis.quit()
+  } catch (error) {
+    console.error('Error closing Redis connection:', error)
   }
 }
