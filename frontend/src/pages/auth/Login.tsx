@@ -14,7 +14,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import { Eye, EyeOff, Mail, Lock, MessageCircle, Sparkles, Brain, Zap } from 'lucide-react'
+import { Eye, EyeOff, Mail, Lock, Sparkles, Brain, Zap } from 'lucide-react'
+import echowriteLogo from '@/assets/echowrite-logo.png'
 
 import { useApi } from '@/hooks/useApi'
 import { authService } from '@/api/services/auth'
@@ -189,14 +190,12 @@ const Login: React.FC = () => {
   return (
     <div className="echowrite-login-page h-screen flex overflow-hidden">
       {/* Left Side - Login Form */}
-      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <div className="flex-1 flex items-center justify-center py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="w-full max-w-sm">
-          <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm">
+          <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm border-0">
             <CardHeader className="space-y-2 pb-5">
               <div className="flex items-center gap-3 mb-1">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-[#B4400A] via-[#C66A00] to-[#C69000] flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
+                <img src={echowriteLogo} alt="Echowrite Logo" className="w-8 h-8 object-contain" />
                 <div>
                   <CardTitle className="text-xl font-bold text-white">Welcome Back</CardTitle>
                 </div>
@@ -224,7 +223,7 @@ const Login: React.FC = () => {
                       value={formData.email}
                       onChange={handleChange}
                       disabled={isFormDisabled}
-                      className="echowrite-input pl-10 h-10 transition-all duration-200"
+                      className="echowrite-input pl-10 h-10 transition-all duration-200 focus:ring-0 focus:border-gray-600"
                     />
                   </div>
                 </div>
@@ -252,7 +251,7 @@ const Login: React.FC = () => {
                       value={formData.password}
                       onChange={handleChange}
                       disabled={isFormDisabled}
-                      className="echowrite-input pl-10 pr-10 h-10 transition-all duration-200"
+                      className="echowrite-input pl-10 pr-10 h-10 transition-all duration-200 focus:ring-0 focus:border-gray-600"
                     />
                     <button
                       type="button"
@@ -300,10 +299,13 @@ const Login: React.FC = () => {
               <CardFooter className="flex flex-col space-y-3 pt-1">
                 <Button
                   type="submit"
-                  className="w-full h-10 bg-gradient-to-r from-[#A43A09] via-[#B65A00] to-[#B68000] hover:from-[#943309] hover:via-[#A55000] hover:to-[#A57000] text-white font-medium shadow-lg shadow-orange-900/25 transition-all duration-200 transform hover:scale-[1.02]"
+                  className="w-full h-10 text-white font-medium shadow-lg transition-all duration-200 transform hover:scale-[1.02] border-0"
+                  style={{
+                    background: 'rgba(180, 64, 10, 0.12)',
+                  }}
                   disabled={isFormDisabled}
                 >
-                  {(loading || clicked) && <Spinner className="dark:text-black text-white mr-2" />}
+                  {(loading || clicked) && <Spinner className="dark:text-white text-white mr-2" />}
                   Sign in to EchoWrite
                 </Button>
 
@@ -374,7 +376,11 @@ const Login: React.FC = () => {
           <div className="max-w-lg text-center">
             <div className="flex items-center justify-center mb-8">
               <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-                <MessageCircle className="w-10 h-10 text-white" />
+                <img
+                  src={echowriteLogo}
+                  alt="Echowrite Logo"
+                  className="w-10 h-10 object-contain"
+                />
               </div>
             </div>
 

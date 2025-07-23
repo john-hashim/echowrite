@@ -27,6 +27,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
   >([])
   const [streamingMessages, setStreamingMessages] = useState<Record<string, StreamingMessage>>({})
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
   const streamingIntervals = useRef<Record<string, NodeJS.Timeout>>({})
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
@@ -44,6 +45,17 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
   )
 
   const { updateThread, unshiftThread } = useAppStore()
+
+  // Check if mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+
+    checkMobile()
+    window.addEventListener('resize', checkMobile)
+    return () => window.removeEventListener('resize', checkMobile)
+  }, [])
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -261,6 +273,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
     scrollToBottom()
   }, [messageCount, lastMessageId])
 
+  // Dynamic width classes based on device type
+  const containerWidthClass = isMobile ? 'w-[95%] max-w-none' : 'w-[70%] max-w-4xl'
+  const messageWidthClass = isMobile ? 'w-[95%] max-w-none' : 'w-[70%] max-w-4xl'
+
   return (
     <div
       className="h-full flex flex-col"
@@ -304,11 +320,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
                 key={message.id}
                 className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-center'}`}
               >
-                <div className="w-[70%] max-w-4xl">
+                <div className={messageWidthClass}>
                   <div
                     className={`px-6 py-4 rounded-2xl transition-all duration-200 hover:scale-[1.01] ${
                       message.role === 'user'
-                        ? 'rounded-br-md ml-auto max-w-[75%]'
+                        ? `rounded-br-md ml-auto ${isMobile ? 'max-w-[85%]' : 'max-w-[75%]'}`
                         : 'rounded-bl-md'
                     }`}
                     style={{
@@ -378,7 +394,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
 
       {/* Custom Input Area */}
       <div className="px-6 pb-6 flex justify-center">
-        <div className="w-[70%] max-w-4xl">
+        <div className={containerWidthClass}>
           <div
             className="relative rounded-2xl shadow-2xl transition-all duration-200 focus-within:scale-[1.01]"
             style={{

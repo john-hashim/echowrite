@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/card'
 import { MessageCircle, LogOut, ArrowRight } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
+import echowriteLogo from '@/assets/echowrite-logo.png'
 
 const SetupTone: React.FC = () => {
   const [toneText, setToneText] = useState('')
@@ -68,7 +69,7 @@ const SetupTone: React.FC = () => {
   return (
     <div className="echowrite-login-page h-screen flex overflow-hidden relative">
       {/* Header with Logout - Absolute positioned */}
-      <div className="absolute top-6 right-6 z-10">
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-10">
         <Button
           onClick={handleLogout}
           disabled={logoutLoading}
@@ -81,36 +82,43 @@ const SetupTone: React.FC = () => {
           ) : (
             <LogOut className="mr-2 w-4 h-4" />
           )}
-          Logout
+          <span className="hidden sm:inline">Logout</span>
         </Button>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center px-4 py-6">
+      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
         <div className="w-full max-w-2xl">
           {/* Header Section */}
           <div className="text-center mb-6">
             {/* Logo with Message Icon */}
-            <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-[#B4400A] via-[#C66A00] to-[#C69000] rounded-2xl flex items-center justify-center shadow-2xl">
-                <MessageCircle className="w-8 h-8 text-white" />
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <img
+                src={echowriteLogo}
+                alt="Echowrite Logo"
+                className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+              />
+              <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-xl sm:rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                <MessageCircle className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-white mb-3">Set Your Writing Tone</h1>
-            <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+              Set Your Writing Tone
+            </h1>
+            <p className="text-base sm:text-lg text-gray-300 mb-6 leading-relaxed px-2">
               Help EchoWrite understand your unique voice and writing style for personalized content
               generation.
             </p>
           </div>
 
           {/* Tone Setup Card */}
-          <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm">
+          <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm border-0">
             <CardHeader className="space-y-2 pb-4">
-              <CardTitle className="text-xl font-bold text-white text-center">
+              <CardTitle className="text-lg sm:text-xl font-bold text-white text-center">
                 Describe Your Writing Style
               </CardTitle>
-              <CardDescription className="text-gray-400 text-center text-sm">
+              <CardDescription className="text-gray-400 text-center text-sm px-2">
                 Share examples of your preferred tone, style, and voice. This helps our AI match
                 your unique writing personality.
               </CardDescription>
@@ -118,7 +126,7 @@ const SetupTone: React.FC = () => {
 
             <CardContent className="space-y-4">
               {/* Word Count Indicator */}
-              <div className="flex justify-between items-center mb-2">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2 gap-1 sm:gap-0">
                 <span className="text-sm text-gray-400">
                   Word count: <span className="text-white font-medium">{wordCount}</span>
                 </span>
@@ -145,7 +153,7 @@ const SetupTone: React.FC = () => {
                   value={toneText}
                   onChange={e => setToneText(e.target.value)}
                   placeholder="Describe your writing style here... For example: 'I prefer a conversational and friendly tone with a touch of humor. I like to use simple language that's easy to understand, and I often include personal anecdotes. My writing tends to be encouraging and optimistic, and I enjoy using metaphors to explain complex ideas. I write like I'm talking to a close friend - warm, genuine, and authentic.'"
-                  className="echowrite-input min-h-[150px] max-h-[150px] text-gray-100 placeholder-gray-500 resize-none transition-all duration-200 overflow-y-auto"
+                  className="echowrite-input min-h-[120px] sm:min-h-[150px] max-h-[200px] text-gray-100 placeholder-gray-500 resize-none transition-all duration-200 focus:ring-0 focus:border-gray-600 overflow-y-auto text-sm sm:text-base"
                   disabled={saveLoading}
                 />
               </div>
@@ -155,11 +163,16 @@ const SetupTone: React.FC = () => {
               <Button
                 onClick={saveToneText}
                 disabled={!isButtonEnabled}
-                className="w-full h-11 bg-gradient-to-r from-[#A43A09] via-[#B65A00] to-[#B68000] hover:from-[#943309] hover:via-[#A55000] hover:to-[#A57000] text-white font-medium shadow-lg shadow-orange-900/25 transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                className="w-full h-10 sm:h-11 text-white font-medium shadow-lg transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none border-0 text-sm sm:text-base"
+                style={{
+                  background: isButtonEnabled
+                    ? 'rgba(180, 64, 10, 0.12)'
+                    : 'rgba(180, 64, 10, 0.06)',
+                }}
               >
                 {saveLoading ? (
                   <>
-                    <Spinner className="mr-2" />
+                    <Spinner className="mr-2 dark:text-white text-white" />
                     Setting up your tone...
                   </>
                 ) : (
@@ -174,7 +187,7 @@ const SetupTone: React.FC = () => {
 
           {/* Footer Note */}
           <div className="text-center mt-4">
-            <p className="text-sm text-gray-400">
+            <p className="text-xs sm:text-sm text-gray-400 px-4">
               Don't worry, you can always update your tone preferences later in settings.
             </p>
           </div>

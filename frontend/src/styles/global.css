@@ -211,7 +211,6 @@
 }
 
 .dark .echowrite-input:focus {
-  border-color: var(--echowrite-orange-primary);
   box-shadow: 0 0 0 3px rgba(180, 64, 10, 0.2);
 }
 
@@ -278,4 +277,149 @@
 
 [data-state='expanded'] .sidebar-icon {
   animation: fadeOut 300ms ease-in-out forwards;
+}
+
+/* Mobile-specific styles for Chat component */
+/* Add these to your existing CSS file */
+
+/* Mobile sidebar animations */
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutToLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+/* Mobile sidebar overlay */
+.mobile-sidebar-overlay {
+  animation: slideInFromLeft 300ms ease-out forwards;
+}
+
+.mobile-sidebar-overlay.closing {
+  animation: slideOutToLeft 300ms ease-in forwards;
+}
+
+/* Mobile header styles */
+.mobile-chat-header {
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Prevent body scroll when sidebar is open on mobile */
+.mobile-sidebar-open {
+  overflow: hidden;
+}
+
+/* Mobile-specific thread sidebar adjustments */
+@media (max-width: 768px) {
+  /* Adjust thread items for touch interaction */
+  .thread-item {
+    min-height: 48px; /* Minimum touch target size */
+    padding: 12px 16px;
+  }
+
+  /* Larger touch targets for buttons */
+  .thread-action-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Adjust chat interface padding for mobile header */
+  .chat-interface-mobile {
+    padding-top: 80px; /* Account for fixed header */
+  }
+
+  /* Mobile-specific input adjustments */
+  .chat-input-container {
+    padding: 16px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  /* Safe area adjustments for iPhone */
+  .mobile-sidebar {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .mobile-header {
+    padding-top: max(16px, env(safe-area-inset-top));
+  }
+}
+
+/* Tablet-specific adjustments */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .sidebar-collapsed-tablet {
+    width: 60px;
+  }
+
+  .sidebar-expanded-tablet {
+    width: 280px;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase tap targets for touch devices */
+  .sidebar-trigger-mobile {
+    min-width: 48px;
+    min-height: 48px;
+  }
+
+  /* Remove hover effects on touch devices */
+  .touch-optimized:hover {
+    transform: none !important;
+    scale: none !important;
+  }
+
+  /* Active states for touch feedback */
+  .touch-optimized:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* Landscape mobile adjustments */
+@media (max-width: 968px) and (orientation: landscape) {
+  .mobile-sidebar {
+    width: 320px; /* Slightly wider in landscape */
+  }
+
+  .mobile-header {
+    height: 60px; /* Shorter header in landscape */
+  }
+
+  .chat-interface-mobile {
+    padding-top: 60px;
+  }
+}
+
+/* High DPI mobile displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mobile-header {
+    border-bottom: 0.5px solid rgba(148, 163, 184, 0.3);
+  }
+}
+
+button[class*='bg-primary'],
+button[class*='bg-secondary'],
+button[class*='bg-destructive'],
+button[class*='bg-outline'],
+.btn {
+  cursor: pointer;
+}
+
+/* Or more broadly target all buttons */
+button:not(:disabled) {
+  cursor: pointer;
 }

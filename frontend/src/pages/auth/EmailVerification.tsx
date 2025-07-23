@@ -15,6 +15,7 @@ import { Loader2, CheckCircle2, Mail } from 'lucide-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { authService } from '@/api/services/auth'
+import echowriteLogo from '@/assets/echowrite-logo.png'
 import {
   EmailVerificationSendApiResponce,
   verificationResponce,
@@ -181,11 +182,12 @@ const EmailVerification: React.FC = () => {
   return (
     <div className="echowrite-login-page h-screen flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-md">
-        <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm">
+        <Card className="echowrite-login-card shadow-2xl backdrop-blur-sm border-0">
           <CardHeader className="space-y-2 pb-5 text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-[#B4400A] via-[#C66A00] to-[#C69000] flex items-center justify-center">
-                <Mail className="w-6 h-6 text-white" />
+              <img src={echowriteLogo} alt="Echowrite Logo" className="w-8 h-8 object-contain" />
+              <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                <Mail className="w-5 h-5 text-white" />
               </div>
             </div>
             <CardTitle className="text-2xl font-bold text-white">Verify your email</CardTitle>
@@ -218,7 +220,7 @@ const EmailVerification: React.FC = () => {
                       onChange={e => handleChange(index, e.target.value)}
                       onKeyDown={e => handleKeyDown(index, e)}
                       onPaste={index === 0 ? handlePaste : undefined}
-                      className={`echowrite-input h-14 w-12 text-center text-lg font-semibold sm:h-16 sm:w-14 transition-all duration-200 ${
+                      className={`echowrite-input h-14 w-12 text-center text-lg font-semibold sm:h-16 sm:w-14 transition-all duration-200 focus:ring-0 focus:border-gray-600 ${
                         otp[index] ? 'border-[#B4400A] bg-black/70' : ''
                       }`}
                       autoFocus={index === 0}
@@ -246,12 +248,15 @@ const EmailVerification: React.FC = () => {
           <CardFooter className="flex flex-col space-y-3 pt-1">
             <Button
               onClick={handleVerify}
-              className="w-full h-10 bg-gradient-to-r from-[#A43A09] via-[#B65A00] to-[#B68000] hover:from-[#943309] hover:via-[#A55000] hover:to-[#A57000] text-white font-medium shadow-lg shadow-orange-900/25 transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full h-10 text-white font-medium shadow-lg transition-all duration-200 transform hover:scale-[1.02] border-0"
+              style={{
+                background: 'rgba(180, 64, 10, 0.12)',
+              }}
               disabled={!isComplete || isFormDisabled}
             >
               {verifyLoading ? (
                 <span className="flex items-center gap-2">
-                  <Spinner className="dark:text-black text-white" />
+                  <Spinner className="dark:text-white text-white" />
                   Verifying...
                 </span>
               ) : isComplete ? (
