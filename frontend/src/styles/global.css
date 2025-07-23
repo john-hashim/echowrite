@@ -254,3 +254,251 @@
   outline: 2px solid var(--echowrite-orange-primary);
   outline-offset: 2px;
 }
+
+/* Fade animation for sidebar content */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+[data-state='collapsed'] .sidebar-fade {
+  display: none;
+  animation: fadeOut 300ms ease-in-out forwards;
+}
+
+[data-state='expanded'] .sidebar-fade {
+  animation: fadeIn 300ms ease-in-out forwards;
+}
+
+[data-state='collapsed'] .sidebar-icon {
+  animation: fadeIn 300ms ease-in-out forwards;
+  animation-delay: 150ms;
+}
+
+[data-state='expanded'] .sidebar-icon {
+  animation: fadeOut 300ms ease-in-out forwards;
+}
+
+.echowrite-chat-container {
+  background: linear-gradient(135deg, #000000, #030712, #0f172a);
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(0 0% 98%);
+  --muted: hsl(0 0% 14.9%);
+  --muted-foreground: hsl(0 0% 63.9%);
+  --border: hsl(0 0% 22%);
+  --card: hsl(0 0% 3.9%);
+  --card-foreground: hsl(0 0% 98%);
+}
+
+/* Sidebar Styling */
+.echowrite-sidebar {
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(8px);
+  transition: all 0.3s ease;
+}
+
+/* Sidebar Header */
+.echowrite-sidebar-header {
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sidebar Content */
+.echowrite-sidebar-content {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+/* Sidebar Footer */
+.echowrite-sidebar-footer {
+  background: rgba(0, 0, 0, 0.8);
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Chat Main Area */
+.echowrite-chat-main {
+  background: linear-gradient(135deg, #0f172a, #030712, #000000);
+}
+
+/* Thread Sidebar Overrides */
+.echowrite-sidebar .border-r {
+  border-right: none !important;
+}
+
+.echowrite-sidebar .bg-card {
+  background: transparent !important;
+}
+
+.echowrite-sidebar .border-border {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.echowrite-sidebar .text-foreground {
+  color: hsl(0 0% 98%) !important;
+}
+
+.echowrite-sidebar .text-muted-foreground {
+  color: hsl(0 0% 70%) !important;
+}
+
+/* Thread Item Styling */
+.echowrite-sidebar .hover\\:bg-accent:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.echowrite-sidebar .bg-accent {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* New Chat Button - Remove orange background, use theme text color */
+.echowrite-sidebar button[class*='w-full justify-start'] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--echowrite-orange-primary) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease !important;
+}
+
+.echowrite-sidebar button[class*='w-full justify-start']:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--echowrite-orange-secondary) !important;
+  transform: scale(1.02);
+}
+
+.echowrite-sidebar button[variant='outline'] {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: var(--echowrite-orange-primary) !important;
+}
+
+.echowrite-sidebar button[variant='outline']:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--echowrite-orange-secondary) !important;
+}
+
+/* Dropdown Menu Styling */
+.echowrite-sidebar [role='menu'] {
+  background: rgba(0, 0, 0, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+}
+
+.echowrite-sidebar [role='menuitem'] {
+  color: hsl(0 0% 98%) !important;
+}
+
+.echowrite-sidebar [role='menuitem']:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.echowrite-sidebar [role='menuitem'].text-destructive {
+  color: #ef4444 !important;
+}
+
+/* Thread items with better spacing and hover effects */
+.echowrite-sidebar .group {
+  transition: all 0.2s ease;
+}
+
+.echowrite-sidebar .group:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: translateX(2px);
+}
+
+/* Background pattern for sidebar (subtle) */
+.echowrite-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.02) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.01) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.echowrite-sidebar > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Loading states */
+.echowrite-sidebar .animate-spin {
+  color: var(--echowrite-orange-primary) !important;
+}
+
+/* Icon centering for collapsed state */
+.echowrite-sidebar[data-state='collapsed'] .sidebar-icon {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+}
+
+.echowrite-sidebar[data-state='expanded'] .sidebar-icon {
+  opacity: 0 !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .echowrite-sidebar {
+    border-right-width: 0;
+  }
+}
+
+/* Animation enhancements for sidebar transitions */
+.echowrite-sidebar {
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Enhanced fade animations */
+@keyframes echowriteFadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateX(-10px);
+  }
+}
+
+@keyframes echowriteFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateX(0);
+  }
+}
+
+[data-state='collapsed'] .sidebar-fade {
+  animation: echowriteFadeOut 300ms ease-in-out forwards;
+}
+
+[data-state='expanded'] .sidebar-fade {
+  animation: echowriteFadeIn 300ms ease-in-out forwards;
+  animation-delay: 50ms;
+}

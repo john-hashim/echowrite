@@ -32,10 +32,9 @@ import { Input } from '@/components/ui/input'
 
 interface ThreadSidebarProps {
   currentThreadId?: string
-  onLogout: () => void
 }
 
-const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout }) => {
+const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId }) => {
   const navigate = useNavigate()
   const [openRenameDialog, setOpenRenameDialog] = useState(false)
   const [renameTitle, setRenameTitle] = useState('')
@@ -158,7 +157,7 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
 
   return (
     <>
-      <div className="w-80 border-r border-border bg-card flex flex-col h-screen">
+      <div className="border-r border-border bg-card flex flex-col h-screen">
         <div className="p-4 border-b border-border">
           <Button
             onClick={handleNewChat}
@@ -256,13 +255,6 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId, onLogout
               <p className="text-xs text-muted-foreground mt-1">Start a new chat to begin</p>
             </div>
           )}
-        </div>
-
-        <div className="p-4 border-t border-border">
-          <Button onClick={onLogout} variant="outline" className="w-full justify-start gap-2">
-            <LogOut className="h-4 w-4" />
-            Logout
-          </Button>
         </div>
       </div>
 
