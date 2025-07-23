@@ -118,3 +118,139 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* EchoWrite Theme CSS - Add to your main CSS file */
+/* This works with your existing theme provider */
+
+/* CSS Custom Properties for EchoWrite Colors */
+:root {
+  /* EchoWrite Orange Palette */
+  --echowrite-orange-primary: #b4400a;
+  --echowrite-orange-secondary: #c66a00;
+  --echowrite-orange-tertiary: #c69000;
+
+  /* Darker variants for buttons */
+  --echowrite-orange-dark-primary: #a43a09;
+  --echowrite-orange-dark-secondary: #b65a00;
+  --echowrite-orange-dark-tertiary: #b68000;
+
+  /* Hover states */
+  --echowrite-orange-hover-primary: #943309;
+  --echowrite-orange-hover-secondary: #a55000;
+  --echowrite-orange-hover-tertiary: #a57000;
+
+  /* Background gradients */
+  --echowrite-bg-gradient: linear-gradient(135deg, #c4500a, #8b4513, #000000);
+  --echowrite-button-gradient: linear-gradient(135deg, #a43a09, #b65a00, #b68000);
+  --echowrite-button-hover-gradient: linear-gradient(135deg, #943309, #a55000, #a57000);
+}
+
+/* Theme-agnostic utility classes */
+.echowrite-bg-gradient {
+  background: var(--echowrite-bg-gradient);
+}
+
+.echowrite-button {
+  background: var(--echowrite-button-gradient);
+  color: white;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.echowrite-button:hover {
+  background: var(--echowrite-button-hover-gradient);
+  transform: scale(1.02);
+}
+
+.echowrite-text-primary {
+  color: var(--echowrite-orange-primary);
+}
+
+.echowrite-text-secondary {
+  color: var(--echowrite-orange-secondary);
+}
+
+.echowrite-border-primary {
+  border-color: var(--echowrite-orange-primary);
+}
+
+.echowrite-focus:focus {
+  border-color: var(--echowrite-orange-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(180, 64, 10, 0.2);
+}
+
+/* Login page specific styles that override theme provider when needed */
+.echowrite-login-page {
+  /* Force dark theme for login page */
+  --background: hsl(0 0% 0%);
+  --foreground: hsl(0 0% 98%);
+  --muted: hsl(0 0% 14.9%);
+  --muted-foreground: hsl(0 0% 63.9%);
+  --border: hsl(0 0% 22%);
+  --card: hsl(0 0% 3.9%);
+  --card-foreground: hsl(0 0% 98%);
+  background: linear-gradient(135deg, #000000, #030712, #0f172a);
+}
+
+/* Dark theme overrides for your existing theme provider */
+.dark .echowrite-login-card {
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(124, 45, 18, 0.5);
+  backdrop-filter: blur(4px);
+}
+
+.dark .echowrite-input {
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid hsl(0 0% 22%);
+  color: hsl(0 0% 98%);
+}
+
+.dark .echowrite-input::placeholder {
+  color: hsl(0 0% 45%);
+}
+
+.dark .echowrite-input:focus {
+  border-color: var(--echowrite-orange-primary);
+  box-shadow: 0 0 0 3px rgba(180, 64, 10, 0.2);
+}
+
+/* Light theme compatibility (in case you enable it later) */
+.light .echowrite-login-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(180, 64, 10, 0.2);
+}
+
+.light .echowrite-input {
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid hsl(0 0% 80%);
+  color: hsl(0 0% 10%);
+}
+
+/* Responsive design utilities */
+@media (max-width: 768px) {
+  .echowrite-login-page {
+    padding: 1rem;
+  }
+}
+
+/* Animation utilities */
+@keyframes echowrite-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.echowrite-pulse {
+  animation: echowrite-pulse 3s ease-in-out infinite;
+}
+
+/* Button focus states for accessibility */
+.echowrite-button:focus-visible {
+  outline: 2px solid var(--echowrite-orange-primary);
+  outline-offset: 2px;
+}
