@@ -466,39 +466,42 @@
   }
 }
 
-/* Animation enhancements for sidebar transitions */
-.echowrite-sidebar {
-  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Enhanced fade animations */
-@keyframes echowriteFadeOut {
+/* Fade animation for sidebar content */
+@keyframes fadeOut {
   from {
     opacity: 1;
-    transform: scale(1) translateX(0);
+    transform: scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0.95) translateX(-10px);
+    transform: scale(0.95);
   }
 }
 
-@keyframes echowriteFadeIn {
+@keyframes fadeIn {
   from {
     opacity: 0;
-    transform: scale(0.95) translateX(-10px);
+    transform: scale(0.95);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateX(0);
+    transform: scale(1);
   }
 }
 
 [data-state='collapsed'] .sidebar-fade {
-  animation: echowriteFadeOut 300ms ease-in-out forwards;
+  animation: fadeOut 300ms ease-in-out forwards;
 }
 
 [data-state='expanded'] .sidebar-fade {
-  animation: echowriteFadeIn 300ms ease-in-out forwards;
-  animation-delay: 50ms;
+  animation: fadeIn 300ms ease-in-out forwards;
+}
+
+[data-state='collapsed'] .sidebar-icon {
+  animation: fadeIn 300ms ease-in-out forwards;
+  animation-delay: 150ms;
+}
+
+[data-state='expanded'] .sidebar-icon {
+  animation: fadeOut 300ms ease-in-out forwards;
 }

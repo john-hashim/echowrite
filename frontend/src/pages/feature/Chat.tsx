@@ -14,6 +14,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from '@/components/ui/sidebar'
 import { Button } from '@/components/ui/button'
 import { LogOut } from 'lucide-react'
