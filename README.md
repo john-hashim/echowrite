@@ -1,20 +1,28 @@
 # EchoWrite
 
-**EchoWrite** is a web app that takes AI-generated content and rewrites it with a more natural, human-like tone. Ideal for users who want their AI content to sound more personal, authentic, and relatable.
+A personalized AI chat app that adapts to your communication style.
 
-## ✨ Features
+🌐 [echowrite.app](https://echowrite.app)
 
-- 🧠 AI-powered tone adjustment using **Gemini AI**
-- 🌐 Modern frontend built with **React** and **TypeScript**
-- 📦 Global state management using **Zustand**
-- 📬 Email notifications powered by **Nodemailer**
-- 🗄️ Data storage with **PostgreSQL**
-- ⚙️ RESTful backend using **Node.js** and **Express**
+## Built With
 
-## 🚀 Getting Started
+- **React** - Frontend framework for building the user interface
+- **TypeScript** - Adds type safety and better developer experience
+- **Zustand** - Lightweight state management for handling app state
+- **Tailwind CSS** - Utility-first CSS framework for rapid styling
+- **shadcn/ui** - Beautiful and accessible React component library
+- **Node.js** - JavaScript runtime for the backend server
+- **Nodemailer** - Email service for sending notifications and updates
+- **Google OAuth** - Secure user authentication and login system
+- **Redis** - In-memory database for caching chat conversations and user sessions
+- **PostgreSQL** - Relational database for storing user data and chat history
+- **Prisma** - Modern database toolkit and ORM for type-safe database operations
+- **Google Generative AI API** - Powers the intelligent chat responses and tone adaptation
 
-### Prerequisites
+## Features
 
-- Node.js (v18+ recommended)
-- PostgreSQL
-- Gemini AI API access
+- AI chat with memory
+- User-specific tone adaptation
+- Google OAuth login
+- Email notifications
+- Responsive design
