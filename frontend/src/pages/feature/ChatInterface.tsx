@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react'
-import { Send, Sparkles, Copy, Check } from 'lucide-react'
+import { Send, Copy, Check } from 'lucide-react'
 import { useAppStore } from '@/store/appStore'
 import { featureService } from '@/api/services/feature'
 import { ApiResponse, Thread } from '@/types/chat'
 import { useApi } from '@/hooks/useApi'
 import { toast } from 'sonner'
 import { useNavigate } from 'react-router-dom'
+import echowriteLogo from '@/assets/echowrite-logo.png'
 
 interface ChatInterfaceProps {
   threadId?: string
@@ -262,6 +263,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
     }
   }
 
+  const user = useAppStore(state => state.user)
+
   // Combine real messages with temporary messages
   const allMessages = [...(thread?.message || []), ...tempMessages]
 
@@ -281,7 +284,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
     <div
       className="h-full flex flex-col"
       style={{
-        background: 'oklch(0.205 0 0)',
+        background: 'oklch(0.23 0 0)',
       }}
     >
       {/* Header */}
@@ -299,18 +302,23 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
           <div className="flex items-center justify-center h-full">
             <div className="text-center max-w-md">
               <div
-                className="p-8 rounded-2xl mb-6 mx-auto w-fit transition-all duration-200 hover:scale-[1.02]"
+                className="p-2 rounded-2xl mb-6 mx-auto w-fit transition-all duration-200 hover:scale-[1.02]"
                 style={{
                   background: 'rgba(180, 64, 10, 0.08)',
                 }}
               >
-                <Sparkles className="h-16 w-16 text-white" />
+                <img
+                  src={echowriteLogo}
+                  alt="Echowrite Logo"
+                  className="h-20 w-20 object-contain animate-spin"
+                  style={{
+                    animation: 'spin 10s linear infinite',
+                  }}
+                />
               </div>
-              <h2 className="text-3xl font-bold mb-4 text-white">Start a new conversation</h2>
-              <p className="text-slate-300 text-lg">
-                Ask me anything and I'll help you explore ideas, solve problems, or just have a
-                great conversation.
-              </p>
+              <h2 className="text-3xl font-bold mb-4 text-white">
+                What's New, {user?.name?.split(' ')[0]}?
+              </h2>
             </div>
           </div>
         ) : (
@@ -364,7 +372,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
                   {/* Copy Button - positioned below the message */}
                   {!message.id.includes('temp-loading') && (
                     <div
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} mt-2`}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start px-4'} mt-2`}
                     >
                       <button
                         onClick={() => {
@@ -395,20 +403,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
       {/* Custom Input Area */}
       <div className="px-6 pb-6 flex justify-center">
         <div className={containerWidthClass}>
-          <div
-            className="relative rounded-2xl shadow-2xl transition-all duration-200 focus-within:scale-[1.01]"
-            style={{
-              background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.5)',
-            }}
-          >
+          <div className="relative rounded-2xl border border-gray-600 transition-all duration-200 focus-within:border-gray-400">
             <textarea
               value={messageText}
               onChange={e => setMessageText(e.target.value)}
               onKeyPress={handleKeyPress}
-              placeholder="Ask me anything..."
+              placeholder="Ask EchoWrite anything..."
               disabled={isLoading}
-              className="w-full px-6 py-4 pr-16 bg-transparent text-white placeholder-slate-400 resize-none focus:outline-none rounded-2xl min-h-[60px] max-h-40 disabled:opacity-50 disabled:cursor-not-allowed text-base"
+              className="w-full px-6 py-4 pr-16 bg-transparent text-white placeholder-slate-400 resize-none focus:outline-none rounded-2xl min-h-[100px] max-h-40 disabled:opacity-50 disabled:cursor-not-allowed text-base"
               rows={1}
               style={{
                 fontFamily: 'inherit',
@@ -422,11 +424,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ threadId }) => {
               }}
             />
 
-            {/* Send Button */}
+            {/* Send Button - Bottom Right */}
             <button
               onClick={handleSendMessage}
               disabled={!messageText.trim() || isLoading}
-              className={`absolute right-3 top-1/2 transform -translate-y-1/2 p-3 rounded-xl transition-all duration-200 ${
+              className={`absolute right-3 bottom-3 p-3 rounded-xl transition-all duration-200 ${
                 messageText.trim() && !isLoading
                   ? 'hover:scale-110 active:scale-95'
                   : 'opacity-50 cursor-not-allowed'

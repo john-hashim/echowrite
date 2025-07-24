@@ -164,8 +164,13 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId }) => {
                 ? {
                     background: 'rgba(180, 64, 10, 0.08)',
                     color: '#E2E8F0',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    borderRadius: '0.75rem',
                   }
-                : {}
+                : {
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    borderRadius: '0.75rem',
+                  }
             }
           >
             <MessageSquarePlus className="h-4 w-4" />
@@ -204,6 +209,8 @@ const ThreadSidebar: React.FC<ThreadSidebarProps> = ({ currentThreadId }) => {
                   currentThreadId === thread.id
                     ? {
                         background: 'rgba(180, 64, 10, 0.06)',
+                        border: '1px solid rgba(128, 128, 128, 0.4)',
+                        borderRadius: '0.75rem',
                       }
                     : {}
                 }

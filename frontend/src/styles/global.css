@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+body {
+  font-family: 'Lato', sans-serif;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -196,7 +200,7 @@
 /* Dark theme overrides for your existing theme provider */
 .dark .echowrite-login-card {
   background: rgba(0, 0, 0, 0.9);
-  border: 1px solid rgba(124, 45, 18, 0.5);
+  border: 1px solid rgba(128, 128, 128, 0.4);
   backdrop-filter: blur(4px);
 }
 

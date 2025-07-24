@@ -235,7 +235,7 @@ const Login: React.FC = () => {
                     </Label>
                     <Link
                       to="/forgot-password"
-                      className="text-sm font-medium text-[#B4400A] hover:text-[#C66A00] transition-colors"
+                      className="text-sm font-medium text-gray-400 hover:text-gray-200 transition-colors"
                     >
                       Forgot password?
                     </Link>
@@ -302,6 +302,8 @@ const Login: React.FC = () => {
                   className="w-full h-10 text-white font-medium shadow-lg transition-all duration-200 transform hover:scale-[1.02] border-0"
                   style={{
                     background: 'rgba(180, 64, 10, 0.12)',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    borderRadius: '0.75rem',
                   }}
                   disabled={isFormDisabled}
                 >
@@ -337,9 +339,9 @@ const Login: React.FC = () => {
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleError}
                         theme="filled_black"
-                        size="large"
-                        width={300}
-                        shape="pill"
+                        size="medium"
+                        width={200}
+                        shape="rectangular"
                         useOneTap
                         auto_select={false}
                       />
@@ -351,7 +353,7 @@ const Login: React.FC = () => {
                   <span className="text-gray-400">Don't have an account? </span>
                   <Link
                     to="/register"
-                    className="font-medium text-[#B4400A] hover:text-[#C66A00] transition-colors"
+                    className="font-medium text-gray-400 hover:text-gray-200 transition-colors"
                   >
                     Sign up for free
                   </Link>
@@ -362,9 +364,7 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - App Features */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#C4500A] via-[#8B4513] to-black relative overflow-hidden">
-        {/* Background Pattern */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#A34706] via-[#5A2D12] to-[#0B0B0B] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
           <div className="absolute top-40 right-20 w-24 h-24 bg-white rounded-full blur-lg"></div>
@@ -379,7 +379,7 @@ const Login: React.FC = () => {
                 <img
                   src={echowriteLogo}
                   alt="Echowrite Logo"
-                  className="w-10 h-10 object-contain"
+                  className="w-15 h-15 object-contain"
                 />
               </div>
             </div>

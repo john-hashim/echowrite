@@ -274,30 +274,32 @@ const Register: React.FC = () => {
                     id="agreeTerms"
                     name="agreeTerms"
                     checked={formData.agreeTerms}
-                    onCheckedChange={checked => {
+                    onCheckedChange={checked =>
                       setFormData(prev => ({ ...prev, agreeTerms: checked as boolean }))
-                    }}
+                    }
                     disabled={isFormDisabled}
                     className="border-2 border-border data-[state=checked]:bg-[#B4400A] data-[state=checked]:border-[#B4400A] mt-0.5 flex-shrink-0"
                   />
                   <Label
                     htmlFor="agreeTerms"
-                    className="text-xs font-medium text-gray-300 cursor-pointer leading-4"
+                    className="text-xs font-medium text-gray-300 cursor-pointer leading-5"
                   >
-                    I agree to the{' '}
-                    <Link
-                      to="/terms"
-                      className="text-[#B4400A] hover:text-[#C66A00] transition-colors"
-                    >
-                      terms of service
-                    </Link>{' '}
-                    and{' '}
-                    <Link
-                      to="/privacy"
-                      className="text-[#B4400A] hover:text-[#C66A00] transition-colors"
-                    >
-                      privacy policy
-                    </Link>
+                    <span className="block">
+                      I agree to the{' '}
+                      <Link
+                        to="/terms"
+                        className="text-gray-400 hover:text-gray-200 transition-colors underline underline-offset-2"
+                      >
+                        terms of service
+                      </Link>{' '}
+                      and{' '}
+                      <Link
+                        to="/privacy"
+                        className="text-gray-400 hover:text-gray-200 transition-colors underline underline-offset-2"
+                      >
+                        privacy policy
+                      </Link>
+                    </span>
                   </Label>
                 </div>
 
@@ -317,6 +319,8 @@ const Register: React.FC = () => {
                   className="w-full h-10 text-white font-medium shadow-lg transition-all duration-200 transform hover:scale-[1.02] border-0"
                   style={{
                     background: 'rgba(180, 64, 10, 0.12)',
+                    border: '1px solid rgba(128, 128, 128, 0.4)',
+                    borderRadius: '0.75rem',
                   }}
                   disabled={isFormDisabled}
                 >
@@ -352,11 +356,11 @@ const Register: React.FC = () => {
                         onSuccess={handleGoogleSuccess}
                         onError={handleGoogleError}
                         size="large"
-                        width={300}
+                        width={200}
                         useOneTap
                         auto_select={false}
                         theme="filled_black"
-                        shape="pill"
+                        shape="rectangular"
                       />
                     </div>
                   )}
@@ -366,7 +370,7 @@ const Register: React.FC = () => {
                   <span className="text-gray-400">Already have an account? </span>
                   <Link
                     to="/login"
-                    className="font-medium text-[#B4400A] hover:text-[#C66A00] transition-colors"
+                    className="font-medium text-gray-400 hover:text-gray-200 transition-colors"
                   >
                     Sign in
                   </Link>
@@ -377,9 +381,7 @@ const Register: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - App Features */}
-      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#C4500A] via-[#8B4513] to-black relative overflow-hidden">
-        {/* Background Pattern */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-[#A34706] via-[#5A2D12] to-[#0B0B0B] relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
           <div className="absolute top-40 right-20 w-24 h-24 bg-white rounded-full blur-lg"></div>
@@ -394,7 +396,7 @@ const Register: React.FC = () => {
                 <img
                   src={echowriteLogo}
                   alt="Echowrite Logo"
-                  className="w-10 h-10 object-contain"
+                  className="w-15 h-15 object-contain"
                 />
               </div>
             </div>
