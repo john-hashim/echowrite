@@ -1,28 +1,35 @@
-# EchoWrite
-
-A personalized AI chat app that adapts to your communication style.
+# ✨ EchoWrite  
+**A personalized AI chat app that adapts to your communication style.**
 
 🌐 [echowrite.app](https://echowrite.app)
 
-## Built With
+---
 
-- **React** - Frontend framework for building the user interface
-- **TypeScript** - Adds type safety and better developer experience
-- **Zustand** - Lightweight state management for handling app state
-- **Tailwind CSS** - Utility-first CSS framework for rapid styling
-- **shadcn/ui** - Beautiful and accessible React component library
-- **Node.js** - JavaScript runtime for the backend server
-- **Nodemailer** - Email service for sending notifications and updates
-- **Google OAuth** - Secure user authentication and login system
-- **Redis** - In-memory database for caching chat conversations and user sessions
-- **PostgreSQL** - Relational database for storing user data and chat history
-- **Prisma** - Modern database toolkit and ORM for type-safe database operations
-- **Google Generative AI API** - Powers the intelligent chat responses and tone adaptation
+## 🚀 Features
 
-## Features
+- 🧠 **AI Chat with Memory** – Remembers previous conversations to maintain context.
+- 🎭 **Tone Adaptation** – Customizes responses to match the user's communication style.
+- 🔐 **Google OAuth** – Seamless and secure user login experience.
+- 📬 **Email Notifications** – Stay updated with timely alerts.
+- 📱 **Responsive UI** – Optimized for all devices.
 
-- AI chat with memory
-- User-specific tone adaptation
-- Google OAuth login
-- Email notifications
-- Responsive design
+---
+
+## 🛠️ Tech Stack
+
+| Tech             | Description                                         |
+|------------------|-----------------------------------------------------|
+| **React**        | Frontend framework for dynamic user interfaces      |
+| **TypeScript**   | Static typing for improved reliability              |
+| **Zustand**      | Lightweight global state management                 |
+| **Tailwind CSS** | Utility-first CSS for fast and consistent styling   |
+| **shadcn/ui**    | Accessible and elegant React components             |
+| **Node.js**      | Backend JavaScript runtime                          |
+| **Nodemailer**   | Email delivery service                              |
+| **Google OAuth** | Secure third-party authentication                   |
+| **Redis**        | In-memory store for fast caching and sessions       |
+| **PostgreSQL**   | Robust relational database                          |
+| **Prisma**       | Type-safe ORM for database interactions             |
+| **Google Generative AI API** | Generates smart, context-aware chat responses |
+
+---
