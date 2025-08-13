@@ -1,5 +1,5 @@
 # ✨ EchoWrite  
-**A personalized AI chat app that adapts to your communication style.**
+**A personalized AI chat app that adapts to your communication style.!**
 
 🌐 [echowrite.app](https://echowrite.app)
 
