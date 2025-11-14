@@ -1,7 +1,7 @@
 # ✨ EchoWrite  
 **A personalized AI chat app that adapts to your communication style.!**
 
-🌐 [echowrite.app](https://echowrite.app)
+🌐 [echowrite.app](https://echowrite.app) (AWS instance is now stopped)
 
 ---
 
